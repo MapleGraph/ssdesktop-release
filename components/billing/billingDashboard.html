@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+        <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+        <script type="text/javascript" src="../../loadCSS.js"></script>
+        <script type="text/javascript" src="../../helpers/apiCall.js"></script>
+        <script type="text/javascript" src="../../loadJS.js"></script>
+        <script>
+            window.$ = window.jQuery = require('../../node_modules/jquery/dist/jquery.min.js')
+            const {dialog} = require('electron').remote
+        </script>
+		<style type="text/css">
+			.inventoryText{
+				font-weight: bold;
+			}
+
+			.countBadge{
+				width: 48px;
+				height: 48px;
+				border-radius:100%;
+				box-shadow: 0 2px 8px 0 rgba(174, 174, 174, 0.51);
+				background-color: #0e9d58;
+				justify-content:center;
+				position:absolute;
+				top:-20px;
+				right:-20px;
+			}
+			.viewCard{
+				width: 104px;
+				height: 32px;
+				border-radius: 24px;
+				background-color: #1766a6;
+				justify-content: center
+        	}
+		</style>
+	</head>
+	<body class="menubar-hoverable header-fixed menubar-pin menubar-first" onload="getPendingPICount()">
+        <div class='headerDiv' w3-include-html="../header.html"></div>
+		<!-- BEGIN BASE-->
+		<div id="base">
+            <div id="sidebar" w3-include-html="../sidebar.html"></div>
+			<!-- BEGIN OFFCANVAS LEFT -->
+			<div class="offcanvas">
+			</div><!--end .offcanvas-->
+			<!-- END OFFCANVAS LEFT -->
+			<div id="content">
+				<div class="margin-40 flex-row">
+					<img src="../../assets/img/outlet_billing_icon.png"/>
+					<div class="flex-column" style="padding-left: 20px">
+						<div class="big_header">
+							Outlet Billing and Returns
+						</div>
+					</div>
+				</div>
+				<section>
+					<div class="section-body">
+						<div class='flex-row' style="flex-wrap: wrap">
+							<a class='card cardLink' id="pendingPICount" href="pendingPIList.html">
+                                <img  class='inventoryIcon' src="../../assets/img/process_outlet_orders.png">
+                                <span class="badge badge-success countBadge flex-row text_24_500_fff" id='pendingPICountBadge' style = "display:none"></span>
+								<span class='inventoryText'>Process Outlet Orders</span>
+								<span class="viewCard  flex-row text_16_500_fff">
+									View
+								</span>
+							</a> 
+							<a class='card cardLink' href="manualBilling.html">
+								<img   class='inventoryIcon' src="../../assets/img/create_manual_bill.png">
+								<span class='inventoryText'>Create a Manual Bill </span>
+								<span class="viewCard flex-row text_16_500_fff">
+									View
+								</span>
+							</a>
+							<a class='card cardLink' href="billingHistory.html">
+                                <img  class='inventoryIcon' src="../../assets/img/billing_history.png">
+								<span class='inventoryText'>View Billing History</span>
+								<span class="viewCard  flex-row text_16_500_fff">
+									View
+								</span>
+							</a> 
+							<a class='card cardLink' href="historicalReturn.html">
+                                <img  class='inventoryIcon' src="../../assets/img/order_historical_return.png">
+								<span class='inventoryText'>Outlet Historical Return</span>
+								<span class="viewCard  flex-row text_16_500_fff">
+									View
+								</span>
+							</a> 
+							<a class='card cardLink' id="pendingPICount" href="newReturn.html">
+                                <img  class='inventoryIcon' src="../../assets/img/initiate_new_return.png">
+								<span class='inventoryText'>Initiate New Return</span>
+								<span class="viewCard  flex-row text_16_500_fff">
+										View
+								</span>
+							</a> 
+							<a class='card cardLink'  href="manageDiscount.html">
+                                <img  class='inventoryIcon' src="../../assets/img/discount_icon.png">
+								<span class='inventoryText'>Manage Discount </span>
+								<span class="viewCard  flex-row text_16_500_fff">
+										View
+								</span>
+                            </a> 
+						</div>
+
+					<div><!--end .section-body -->												
+				</section>
+			</div>
+
+		</div>
+		<script type="text/javascript" src="billingDashboard.js"></script>
+        <script type="text/javascript" src="../../helpers.js"></script>
+	
+	</body>
+</html>
+

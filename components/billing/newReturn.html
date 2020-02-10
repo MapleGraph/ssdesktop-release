@@ -1,0 +1,2597 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <script type="text/javascript" src="../../loadCSS.js"></script>
+        <script>
+            // const sqlite3 = require('sqlite3').verbose();
+            // const db = new sqlite3.Database('ssDB');
+            window.$ = window.jQuery = require('../../node_modules/jquery/dist/jquery.min.js');
+			// require('../../assets/js/moment.min.js')
+            require('../../assets/js/libs/bootstrap-table/dist/bootstrap-table.min.js')
+            require('../../assets/js/libs/bootstrap-table/dist/extensions/filter-control/bootstrap-table-filter-control.min.js')
+            require('../../assets/js/libs/bootstrap-table/src/extensions/editable/bootstrap-table-editable.js')
+        </script>
+        <script src="../../bundle.js"></script>
+        <style type="text/css">
+        
+        div.bootstrap-table {
+			border-radius: 4px;
+            background:transparent;
+            padding-top:0px;
+		}
+
+		.fixed-table-toolbar .search{
+            background-color:transparent;
+		}
+
+		.fixed-table-container{
+			padding-top:0px;
+		}
+
+		.fixed-table-toolbar{
+            background-color:transparent;
+            margin-bottom:0px;
+        }
+
+        .fixed-table-loading{
+		    display: none;
+        }
+    
+        .fixed-table-toolbar{
+            display: none;
+        }
+        
+        .bootstrap-table .table thead > tr > th {
+                background: #fff;
+				border:none;
+				font-size: 14px;
+				font-weight: bold;
+				color: #171717;
+				border-bottom: solid 2px #dcdcdc;
+        }
+
+		.rowStyle{
+			background-color: #ffffff;
+			font-size: 14px;
+			font-weight: 500;
+			color: #565656;
+        }
+        
+        .table > tbody > tr > td {
+            padding: 10px 20px 10px 8px;
+        }
+
+        #content{
+            width: calc(85% - 40px);
+            position: relative;
+            right: 0;
+            margin: 0 auto ;
+        }
+
+        html, body{
+            height: 100%;
+        }
+
+        input[type=number]::-webkit-inner-spin-button, 
+		input[type=number]::-webkit-outer-spin-button { 
+			-webkit-appearance: none; 
+			margin: 0; 
+		}
+
+        .customModal{
+            margin:auto;
+            width: 800px;
+            margin-top: 10%;
+        }
+
+        .customModalTwo{
+            margin: auto;
+            width: 600px;
+            margin-top:10%;
+        }
+
+        .tableClass{
+            border:solid 1px lightgray;
+            border-radius: 4px;
+        }
+
+		</style>
+
+    </head>
+    <body class="menubar-hoverable header-fixed menubar-pin menubar-first" onload="getOrderInfo()">
+
+        <div class='headerDiv' w3-include-html="../header.html"></div>
+
+        <div id="base" style="height:100%">
+            <div id="sidebar" w3-include-html="../sidebar.html"></div>
+            <div id="content">
+                
+                <div id="returnModal" class="modal fade" role="dialog" data-keyboard="false" data-backdrop="static">
+                    <div class="modal-dialog customModalTwo">
+                        <div class="modal-content" style="border-radius: 8px;">
+                            <div style="padding:30px;">
+                                <div class="flex-row" style="justify-content: center;margin-top: 20px;margin-bottom: 10px">
+									<img src = "../../assets/img/sucess-icon.png">
+                                </div>
+                                
+                                <div class="flex-row" style="justify-content: center;";>
+                                    <span class="text_18_500_212b36">Your order has been returned successfully</span>
+                                </div>
+
+                                <div style="margin-top:30px; padding-left: 10%;">
+                                    <div class="flex-row">
+                                        <span class="text_16_500_565656">Bill No. : </span>
+                                        <span style="padding-left: 10px;" id="billNo" class="text_16_500_565656"></span>
+                                    </div>
+                                    <div class="flex-row">
+                                        <span class="text_16_500_565656">Bill Amount : &nbsp; &#8377; </span>
+                                        <span style="padding-left: 4px;" id="billAmount" class="text_16_500_565656"></span>
+                                    </div>
+                                    <div class="flex-row">
+                                        <span class="text_16_500_565656">Bill Date & Time : </span>
+                                        <span style="padding-left: 10px;" id="billTime" class="text_16_500_565656"></span>
+                                    </div>
+                                    <div class="flex-row">
+                                        <span class="text_16_500_565656">Return Amount : &nbsp; &#8377;</span>
+                                        <span style="padding-left: 4px;" id="returnAmount" class="text_16_500_565656"></span>
+                                    </div>
+                                    <div class="flex-row">
+                                        <span class="text_16_500_565656">Return Date & Time : </span>
+                                        <span style="padding-left: 10px;" id="returnTime" class="text_16_500_565656"></span>
+                                    </div>
+                                    <div class="flex-row">
+                                        <span class="text_16_500_565656">Return Discount : &nbsp; &#8377;</span>
+                                        <span style="padding-left: 4px;" id="returnDiscount" class="text_16_500_565656"></span>
+                                    </div>
+                                </div>
+
+                                 <div class="flex-row" style="justify-content: center; margin-top:20px">
+                                    <button class='longBtnBlue' onclick="done()">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="deleteModal" class="modal fade" role="dialog">
+                    <div class="modal-dialog customModalTwo">
+                        <div class="modal-content" style="padding:30px; border-radius: 8px;">
+                            <div class="flex-column" style="align-items:center">
+                                <span class="text_18_500_212b36">Are you sure you want to delete this item?</span>
+                                <div class="flex-row" style="margin-top: 10px;">
+                                    <button class='longBtnWhite' data-target="deleteModal" onclick="closeModal(this)">No</button>
+                                    <button style="margin-left:10px;" class='longBtnBlue' onclick="finalDelete()">Yes</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <section id="pastOrdersSection">
+                    <div class="section-body"> 
+
+                        <div style="display:flex;flex-direction: row;justify-content: space-between; margin-top:60px;">
+                            <div class="flex-row" onclick="goBack()" style="cursor: pointer;">
+                                <span><img src="../../assets/img/back_icon.png"  style='width:8px;height:12px;'/></span>
+                                <span style="margin-left: 10px;" class="text_18_500_565656">Initiate New Return</span>
+                            </div>                        
+                        </div>
+                        
+                        <div>
+                            <span class="text_24_500_212b36">Initiate New Return</span>
+                        </div>
+
+                        <div>
+                            <table class="table bulk_action dataTable no-footer" data-row-style="rowStyle" id="pastOrders">
+                                <thead>
+                                    <tr>
+                                        <th data-field = "storeName" data-sortable = "true">Store Name <i class="fa fa-fw fa-sort"></i></th>
+                                        <th data-field = "orderID" data-sortable = "true">Order ID <i class="fa fa-fw fa-sort"></i></th>
+                                        <th data-field= "posDate" data-sortable="true">Date <i class="fa fa-fw fa-sort"></i></th>
+                                        <th data-field= "totalItems" data-sortable="true">No. of Items <i class="fa fa-fw fa-sort"></i></th>
+                                        <th data-field = "grossSale" data-sortable = "true">Price <i class="fa fa-fw fa-sort"></i></th> 
+                                        <th data-formatter = "returnOrder"></th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+
+                    </div>
+                </section>
+
+                <section id="editOrdersSection" style="flex:1; display: none;">
+                    <div class="section-body" style="flex:1">
+
+                        <div style="display:flex;flex-direction: row;justify-content: space-between; margin-top:60px;">
+                            <div class="flex-row" onclick="mainView()" style="cursor: pointer;">
+                                <span><img src="../../assets/img/back_icon.png"  style='width:8px;height:12px;'/></span>
+                                <span style="margin-left: 10px;" class="text_18_500_565656">Initiate New Return</span>
+                            </div>                        
+                        </div>
+                            
+                        <div class="flex-row" style="justify-content: space-between;">
+                            <span class="text_24_500_212b36" id="orderID"></span>
+                            <button class="longBtnBlue" onclick="preview()">Preview</button>
+                        </div>
+                        
+                        <div style="margin-top:10px;">
+                            <span class="text_16_500_565656">Store : </span>
+                            <span class="text_16_500_212b36" id="storeName"></span>
+                        </div>
+
+                        <div class="flex-row" style="margin-top:10px; justify-content: space-between;">
+                            <div class="flex-row">
+                                <span class="text_16_500_565656">Child Party Code : </span>
+                                <span style="padding-left:10px" class="text_16_500_212b36" id="childPartyCode"></span>
+                            </div>
+
+                            <div class="flex-row">
+                                <span class="text_16_500_565656">Date : </span>
+                                <span style="padding-left:10px" class="text_16_500_212b36" id="posDate"></span>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top:20px;">
+                            <table class="table bulk_action dataTable no-footer tableClass" data-row-style="rowStyle" data-row-attributes="rowAttributes" id="orderTable">
+                                <thead>
+                                    <tr>
+                                        <th data-field = "batchVariantName" data-sortable = "false">Batch Variant</th>
+                                        <th data-field = "turPerUnit" data-sortable = "false">TUR</th>   
+                                        <th data-field = "quantityOrdered" data-sortable = "false">Quantity</th>                                                                                
+                                        <th data-formatter="renderQuantity" data-sortable = "false">Units</th> 
+                                        <th data-field= "productValue" data-sortable="false">Price</th>
+                                        <th data-formatter="deleteBatch"></th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+
+                    </div>
+                </section>
+
+                <section id="finalViewSection" style="flex:1; display: none;">
+                    <div class="section-body" style="flex:1">
+                    
+                        <div style="display:flex;flex-direction: row;justify-content: space-between; margin-top:60px;">
+                            <div class="flex-row" onclick="editView()" style="cursor: pointer;">
+                                <span><img src="../../assets/img/back_icon.png"  style='width:8px;height:12px;'/></span>
+                                <span style="margin-left: 10px;" class="text_18_500_565656">Initiate New Return</span>
+                            </div>                        
+                        </div>
+
+                        <div class="flex-row" style="justify-content: space-between;">
+                            <span class="text_24_500_212b36" id="finalOrderID"></span>
+                            <button class="longBtnBlue" id="confirm" onclick="confirm()">Confirm Return</button>
+                        </div>
+
+                        <div style="margin-top:10px;">
+                            <span class="text_16_500_565656">Store : </span>
+                            <span class="text_16_500_212b36" id="finalStoreName"></span>
+                        </div>
+
+                        <div class="flex-row" style="margin-top:10px; justify-content: space-between;">
+                            <div class="flex-row">
+                                <span class="text_16_500_565656">Child Party Code : </span>
+                                <span style="padding-left:10px" class="text_16_500_212b36" id="finalChildPartyCode"></span>
+                            </div>
+
+                            <div class="flex-row">
+                                <span class="text_16_500_565656">Date : </span>
+                                <span style="padding-left:10px" class="text_16_500_212b36" id="finalPosDate"></span>
+                            </div>
+                        </div>
+
+                        <div style="margin-top:30px;">
+                            <table class="table bulk_action dataTable no-footer tableClass" data-row-style="rowStyle" id="finalTable">
+                                <thead>
+                                    <tr>
+                                        <th data-field = "batchVariantName" data-sortable = "false">Batch Variant</th>
+                                        <th data-field="remarksList">Remarks</th>
+                                        <th data-field = "turPerUnit" data-sortable = "false">TUR</th>                                        
+                                        <th data-field="voidQuantity" data-sortable = "false">Units</th> 
+                                        <th data-field="refundDiscount" data-sortable = "false" class="discounted">Discount</th> 
+                                        <th data-field= "voidItemsSales" data-sortable="false">Sales</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+
+                        <div class="flex-row" style="justify-content: space-between; margin-top: 30px; padding-top: 20px; border-top: solid 1px lightgray;">
+                            <div>
+                                <span class="text_24_500_212b36">Total</span>
+                            </div>
+
+                            <div>
+                                <div class="flex-row">
+                                    <span class="text_16_500_565656">Total Items : </span>
+                                    <span style="padding-left:10px" class="text_16_500_212b36" id="totalItems"></span>
+                                </div>
+
+                                <div class="flex-row">
+                                    <span class="text_16_500_565656">Subtotal : &nbsp; &#8377; </span>
+                                    <span style="padding-left:4px" class="text_16_500_212b36" id="subTotal"></span>
+                                </div>
+
+                                <div class="flex-row">
+                                    <span class="text_16_500_de4a49">Total Discount : &nbsp; &#8377; </span>
+                                    <span style="padding-left:4px" class="text_16_500_de4a49" id="refundDiscount"></span>
+                                </div>
+
+                                <div class="flex-row">
+                                    <span class="text_16_500_565656">Tax : &nbsp; &#8377; </span>
+                                    <span style="padding-left:4px" class="text_16_500_565656" id="voidTax"></span>
+                                </div>
+                                
+                                <div class="flex-row" style="margin-top:8px; padding-top: 6px; border-top: solid 1px lightgray">
+                                    <span class="text_16_500_565656">Total : &nbsp; &#8377; </span>
+                                    <span style="padding-left:4px" class="text_16_500_212b36" id="stockValue"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <section id="noSection" style="flex:1; display: none;">
+                    <div class="section-body" style="flex:1">
+
+                        <div style="display:flex;flex-direction: row;justify-content: space-between; margin-top:60px;">
+                            <div class="flex-row" onclick="noSectionGoBack()" style="cursor: pointer;">
+                                <span><img src="../../assets/img/back_icon.png"  style='width:8px;height:12px;'/></span>
+                                <span style="margin-left: 10px;" class="text_18_500_565656">Initiate New Return</span>
+                            </div>                        
+                        </div>
+
+                        <div class="flex-column" style="height: 100px;">
+                            <span id="noSectionHeader" class="text_24_500_212b36"></span>
+                            <span style="margin-top: 10px;" class="text_16_500_212b36">This order has already been returned</span>
+                        </div>
+
+                    </div>
+                </section>
+
+            </div>
+
+        </div>
+
+        <script type="text/javascript" src="../../helpers.js"></script>
+        <script type="text/javascript" src="../../loadJS.js"></script>
+        <script type="text/javascript">
+        
+        const { dialog } = require('electron').remote;
+        require('../../assets/js/moment.min.js')
+
+        var pastOrders,order,refundOrder,orderPayments,cashAccountID,cashAccountInfo,creditAccountID,creditAccountInfo;
+        
+        var discountProductList = [];
+        var discountLevelList = [];
+        var discountDetails = [];
+        var updatedPaymentList = [];
+
+        var demand = [];
+        var damage = [];
+        var displayList = [];
+        var deviceID = localStorage.getItem('deviceID');
+        var store = JSON.parse(localStorage.getItem('loginResponse'));
+        var storeID = store.storeList[0].storeID;
+        var userID = store.userID;
+        var phoneNumber = localStorage.getItem('phoneNumber');
+        var viewBillingDetails = false;
+        var historicalReturn = false;
+        var deleteID;
+        var disabled = false;
+
+        var discountsApplicable = []
+
+        var reRenderLocation = './billingDashboard.html'
+
+        $(document).ready(async()=>{
+            await getMenu('New Return')
+            await backNavigation()
+        })
+
+        backNavigation=()=>{
+            $('#imgForward').css('opacity',0.5)
+            $('#imgBack').css({'opacity':1 , 'cursor' : 'pointer'}).click(()=>{
+                window.location.href=reRenderLocation
+            })
+        }
+
+        $("#returnModal").on("hidden.bs.modal", function () {
+                window.location.href = './newReturn.html';
+        });
+
+        function goBack(){
+            window.location.href = reRenderLocation;
+        }
+
+        function done(){
+            console.log('close')
+            window.location.href = './newReturn.html';
+        }
+
+        function returnOrder(value,row){
+
+            return `<button onclick="selectOrder(this)" id=${row.orderID} class="longBtnWhite">Return</button>`;
+        }
+
+        function mainView(){
+
+            console.log('viewBillingDetails',viewBillingDetails)
+
+            if(historicalReturn){
+
+                window.location.href = './historicalReturn.html';
+                return false;
+            }
+
+            if(viewBillingDetails){
+
+                window.location.href = './billingHistory.html';
+                return false;
+            }
+
+            $('#editOrdersSection').css('display','none');
+            $('#pastOrdersSection').css('display','flex');
+        }
+
+        function noSectionGoBack(){
+
+            if(historicalReturn){
+
+                window.location.href = './historicalReturn.html';
+                return false;
+            }
+
+            if(viewBillingDetails){
+            
+                window.location.href = './billingHistory.html';
+                return false;
+            }
+            
+        }
+
+        function renderQuantity(value,row){
+
+            return '<div class="flex-row"> <button class="cartBtn" id=decrement-'+row.batchVariantID+' onclick="decrement(this)">-</button> <input style="border:0px; text-align:center; margin:0px; width:60px;" type="number" min="0" class="confirmation" id=quantity-'+row.batchVariantID+' value='+0+' onkeypress="return event.charCode >= 48" onchange="handleChange(this)"></input> <button class="cartBtn" id=increment-'+row.batchVariantID+' onclick="increment(this)">+</button> </div>';
+        }
+
+        function deleteBatch(value,row){
+
+            return '<div style="cursor:pointer;" onclick="handleDelete(this)" id=delete-'+row.batchVariantID+'> <img src = "../../assets/img/trash-gray.png"> </div>';
+        }
+
+        function handleDelete(element){
+
+            // var id = element.id;
+            // id = id.substr(7,id.length)
+            // id = '#batch-'+id;
+            
+            // console.log(id)
+            // $(id).remove();
+
+            var id = element.id;
+            id = id.substr(7,id.length)
+            id = '#batch-'+id;
+            deleteID = id;
+
+            $('#deleteModal').modal('show');
+        }
+
+        function rowAttributes(row,index){
+
+            return {id:'batch-'+row.batchVariantID}
+        }
+
+        function decrement(element){
+
+            let id = element.id;
+            id = id.substr(10,id.length);
+            id = '#quantity-'+id;
+
+            let q = $(id).val();
+
+            if(q > 0){
+                --q;
+            }
+            
+            $(id).val(q);
+            console.log(id)
+        }
+
+        function increment(element){
+
+            let id = element.id;
+            id = id.substr(10,id.length);
+            var quantityID = '#quantity-'+id;
+            let q = $(quantityID).val();
+            q++;
+            var batch;
+
+            // console.log(id)
+
+            var productsList = order.orderInformation.productsList;
+
+            for(let i=0;i<productsList.length;i++)
+            {
+                if(id == productsList[i].batchVariantID)
+                {
+                    // console.log(productsList[i])
+                    batch = productsList[i];
+                    break;
+                }
+            }            
+            
+            if(q > batch.quantityOrdered){
+
+                var dialogOptions = {type: 'info', buttons: ['OK'], message: 'Cannot return quantity greater than original quantity ordered in batch '+ batch.batchVariantName}
+                
+                dialog.showMessageBox(dialogOptions, async i => {
+
+                })
+                return false;
+            }
+
+            $(quantityID).val(q);
+        }
+
+        function handleChange(element){
+
+            var q = element.value;
+            var id = element.id;
+            id = id.substr(9,id.length);
+            var quantityID = '#quantity-'+id;
+            var batch;
+
+            var productsList = order.orderInformation.productsList;
+
+            for(let i=0;i<productsList.length;i++)
+            {
+                if(id == productsList[i].batchVariantID)
+                {
+                    // console.log(productsList[i])
+                    batch = productsList[i];
+                    break;
+                }
+            }            
+            
+            if(q > batch.quantityOrdered){
+
+                var dialogOptions = {type: 'info', buttons: ['OK'], message: 'Cannot return quantity greater than original quantity ordered in batch '+ batch.batchVariantName}
+                
+                dialog.showMessageBox(dialogOptions, async i => {
+
+                })
+
+                $(quantityID).val(batch.quantityOrdered)
+                return false;
+            }
+
+            $(quantityID).val(q);
+
+        }
+
+        function selectOrder(element){
+
+            var orderID = element.id;
+
+            for(let i=0;i<pastOrders.length;i++)
+            {
+                if(orderID == pastOrders[i].orderID)
+                {
+                    order = pastOrders[i];
+                    break;
+                }
+            }
+
+            console.log('return order',order)
+
+            if(order == undefined){
+
+                $('#pastOrdersSection').css('display','none');
+                $('#noSectionHeader').text(orderID);
+                $('#noSection').css('display','flex');
+
+                return false;
+            }
+
+            var productsList = order.orderInformation.productsList;
+
+            //discountsApplicable = order.orderInformation.discounts
+
+            productsList = productsList.filter(function(x){
+
+                console.log(x.sbomDesc)
+                if(x.sbomDesc != "LSBOM-C"){
+                    return x;
+                }
+            })
+
+            console.log(productsList)
+
+            $('#orderID').text(order.orderID);   
+            $('#storeName').text(order.storeName);         
+            $('#childPartyCode').text(order.childPartyCode);
+            $('#posDate').text(order.posDate);
+
+            $('#orderTable').bootstrapTable('destroy');
+            $('#orderTable').bootstrapTable({data:productsList,
+                                            search:false,
+                                            reinit: true,
+                                            trimOnSearch:false
+            });
+
+            $('#pastOrdersSection').css('display','none');
+            $('#editOrdersSection').css('display','flex');
+
+        }
+
+        async function getOrderInfo(){
+
+            cashAccountID = await new Promise((resolve,reject)=>{
+
+                db.get(`SELECT * FROM globalTypePaymentAccountIDMapping WHERE key = "PAYMENT_CASH"`,function(err,data){
+
+                    if(err){
+                        console.log(err)
+                    }
+                    else{
+                        resolve(data.accountID);
+                    }
+                })
+            })
+
+            cashAccountInfo = await new Promise((resolve,reject)=>{
+
+                db.get(`SELECT * FROM accountInformation where accountID = ${cashAccountID}`,function(err,data){
+
+                    if(err){
+                        console.log(err)
+                    }
+                    else{
+                        resolve(data);
+                    }
+                })
+            })
+
+            creditAccountID = await new Promise((resolve,reject)=>{
+
+                db.get(`SELECT * FROM globalTypePaymentAccountIDMapping WHERE key = "PAYMENT_CREDIT"`,function(err,data){
+
+                    if(err){
+                        console.log(err)
+                    }
+                    else{
+                        resolve(data.accountID);
+                    }
+                })
+            })
+
+            creditAccountInfo = await new Promise((resolve,reject)=>{
+
+                db.get(`SELECT * FROM accountInformation where accountID = ${creditAccountID}`,function(err,data){
+
+                    if(err){
+                        console.log(err)
+                    }
+                    else{
+                        resolve(data);
+                    }
+                })
+            })
+
+            pastOrders = await new Promise((resolve,reject)=>{
+
+                db.all('SELECT * FROM updatedOrderInformation',function(err,data){
+
+                    if(err){
+                        console.log(err)
+                    }
+                    else{
+                        resolve(data);
+                    }
+                })
+            })
+
+            discountAppliedIDs = await new Promise((resolve,reject)=>{
+                    db.all(`SELECT discountID,customerID FROM discountCustomerMap `,(err,data)=>{
+
+                        if(err){
+                            console.log(err)
+                        }
+                        else{
+                            console.log(data)
+                            resolve(data)
+                        }
+                    });
+                })
+            
+            // discountProductList  = await new Promise((resolve,reject)=>{
+            //         db.all(`SELECT * FROM discountProductMap`,(err,data)=>{
+
+            //             if(err){
+            //                 console.log(err)
+            //             }
+            //             else{
+            //                 console.log(data)
+            //                 resolve(data)
+            //             }
+            //         });
+            // })
+
+            // discountLevelList = await new Promise((resolve,reject)=>{
+            //     db.all(`SELECT * FROM discountLevel`,(err,data)=>{
+
+            //         if(err){
+            //             console.log(err)
+            //         }
+            //         else{
+            //             console.log(data)
+            //             resolve(data)
+            //         }
+            //     });
+            // })
+
+            // discountDetails = await new Promise((resolve,reject)=>{
+            //     db.all(`SELECT * FROM discountMaster`,(err,data)=>{
+
+            //         if(err){
+            //             console.log(err)
+            //         }
+            //         else{
+            //             console.log(data)
+            //             resolve(data)
+            //         }
+            //     });
+            // })
+
+            damage = await new Promise((resolve,reject)=>{
+
+                db.all('SELECT * FROM damage',(err,data)=>{
+
+                    if(err){
+                        console.log(err)
+                    }
+                    else{
+                        console.log('damageList',data)
+                        resolve(data);
+                    }
+                })
+            })
+
+            for(let i=0;i<pastOrders.length;i++)
+            {
+                var x = pastOrders[i];
+                x.orderInformation = JSON.parse(x.orderInformation);
+            }
+
+            pastOrders = pastOrders.filter(function(order){
+
+                if(order.customerInfo != null && order.orderInformation.productsList.length){
+                    return order;
+                }
+            })
+
+            console.log('pastorders',pastOrders);
+
+            for(let i=0;i<pastOrders.length;i++)
+            {
+                var x = pastOrders[i];
+                x.customerInfo = JSON.parse(x.customerInfo);
+                x.storeName = x.customerInfo.firstName;
+            }
+
+            $('#pastOrders').bootstrapTable('destroy');
+            $('#pastOrders').bootstrapTable({data:pastOrders,
+                                            search:false,
+                                            reinit: true,
+                                            trimOnSearch:false
+            });
+
+            var str = window.location.search.split("=");
+            console.log(str)
+            
+            oID = str[1];
+            
+            if(oID == undefined){
+
+                return false;
+            }
+
+            console.log(oID.search('historicalReturn'));
+
+            if(oID.search('historicalReturn') != -1)
+            {
+                oID = oID.split('&');
+                oID = oID[0];
+                historicalReturn = true;
+                console.log('found');
+            }
+
+            if(oID){
+
+                var obj = {
+                    id:oID
+                }
+
+                if(!historicalReturn){
+                    viewBillingDetails = true;
+                }
+
+                console.log(oID)
+                console.log('viewBillingDetails',viewBillingDetails)
+                console.log('historicalReturn',historicalReturn)
+
+                selectOrder(obj);
+            }
+
+        }
+
+        function preview(){
+            var inputs = $('.confirmation');
+            demand = [];
+
+            if(order.orderInformation.discounts){
+                discountsApplicable = order.orderInformation.discounts;
+            }
+            else{
+                discountsApplicable = [];
+            }
+            
+
+            // assigning value = 0 for all undefined inputs
+
+            for(let i=0;i<inputs.length;i++)
+            {
+                if(inputs[i].value == ""){
+                    inputs[i].value = 0;
+                }
+
+                var batchVariantID = inputs[i].id;
+                batchVariantID = batchVariantID.substr(9,batchVariantID.length);
+                batchVariantID = parseInt(batchVariantID);
+
+                var value = parseInt(inputs[i].value);
+
+                // if(value){
+
+                    demand.push({
+                        batchVariantID: batchVariantID,
+                        quantityOrdered: value
+                    })
+
+                // }
+            }
+
+            var allow = false;
+
+            console.log(demand)
+
+            for(let i=0;i<demand.length;i++)
+            {
+                if(demand[i].quantityOrdered){
+                    allow = true;
+                }
+            }
+
+            if(!allow){
+
+                var dialogOptions = {type: 'info', buttons: ['OK'], message: 'Please enter the quantity you want to return in atleast one batch variant.'}
+                
+                dialog.showMessageBox(dialogOptions, async i => {
+                    
+                })
+
+                return false;
+            }
+
+            var productsList = order.orderInformation.productsList;
+
+            productsList = productsList.filter(function(x){
+
+                if(x.sbomDesc != "LSBOM-C"){
+
+                    return x;
+                }
+            })
+
+
+            for(let i=0;i<demand.length;i++)
+            {
+                for(let j=0;j<productsList.length;j++)
+                {
+                    if(demand[i].batchVariantID == productsList[j].batchVariantID)
+                    {
+                        if(demand[i].quantityOrdered  > productsList[j].quantityOrdered)
+                        {
+                            console.log(j+1,demand[i],productsList[j]);
+                            // alert('Cannot return quantity greater than original quantity ordered in batch '+productsList[j].batchVariantName);
+                            
+                            var dialogOptions = {type: 'info', buttons: ['OK'], message: 'Cannot return quantity greater than original quantity ordered in batch '+productsList[j].batchVariantName}
+                
+                            dialog.showMessageBox(dialogOptions, async i => {
+                                
+                            }) 
+                            return ;
+                        }
+
+
+                        var quantityOrdered = demand[i].quantityOrdered;
+
+                        var x = $.extend(true,{},productsList[j]);
+                        demand[i] = x;
+
+                        demand[i].voidQuantity = quantityOrdered;
+                        demand[i].quantityOrdered = productsList[j].quantityOrdered - quantityOrdered;
+                        demand[i].quantityOrderedCost = demand[i].turPerUnit * demand[i].quantityOrdered;
+                        demand[i].quantityOrderedCost = Math.round(demand[i].quantityOrderedCost * 100)/100;
+                        demand[i].discountValues = 0;
+                        demand[i].discounts = [];
+
+                        break;
+                    }
+                }
+            }
+                       
+            finalView();
+        }
+
+        function editView(){
+
+            $('#finalViewSection').css('display','none');
+            $('#editOrdersSection').css('display','flex');
+        }
+
+        async function finalView(){
+                
+            var customerID = order.customerID;
+            //var customerDiscountAppliedIDs = discountAppliedIDs.filter(m=>m.customerID == customerID)
+            
+            // console.log(customerDiscountAppliedIDs,'customerDiscountAppliedIDs')
+            
+            demand = handleDiscountDataForReturn(demand);
+            
+            demand = demand.filter((d)=>{
+
+                if(d.voidQuantity){
+                    return d;
+                }
+            });
+
+            //   handleDiscountToCart(demand,discountProductList,customerDiscountAppliedIDs,discountLevelList,discountDetails)
+            taxCalculator(demand);
+
+            // return;
+
+            var productsList = order.orderInformation.productsList;
+            var paymentList = order.orderInformation.paymentList;
+            updatedPaymentList = JSON.parse(JSON.stringify(paymentList));
+
+            // paymentList.push({num:1});
+
+            // console.log('original paymentList',paymentList)
+            // console.log('updatedPaymentList',updatedPaymentList)
+            // return false;
+
+            var childList = productsList.filter(function(x){
+
+                if(x.sbomDesc == 'LSBOM-C'){
+                    return x;
+                }
+            })
+
+            // have to remove this
+
+            // childList.splice(0,3);
+
+            for(let i=0;i<childList.length;i++)
+            {
+                childList[i].currentInventory = childList[i].inventory;
+                childList[i].totalQuantityOrdered = 0;
+            }
+                    
+
+            for(let i=0;i<demand.length;i++)
+            {
+                for(j=0;j<productsList.length;j++)
+                {
+                    if(demand[i].batchVariantID == productsList[j].batchVariantID)
+                    {
+                        demand[i].voidAmount = productsList[j].productValue - demand[i].productValue;
+                        demand[i].voidAmount = Math.round(demand[i].voidAmount * 1000)/1000;
+                        demand[i].refundDiscount = productsList[j].discountValues - demand[i].discountValues;
+                        demand[i].refundDiscount = Math.round(demand[i].refundDiscount * 1000)/1000;
+                        demand[i].voidItemsSales = productsList[j].itemSales - demand[i].itemSales;
+                        demand[i].voidItemsSales = Math.round(demand[i].voidItemsSales * 1000)/1000;
+                        demand[i].voidTax = productsList[j].totalTaxValue - demand[i].totalTaxValue;
+                        demand[i].voidTax = Math.round(demand[i].voidTax * 1000)/1000;
+                        
+                        break;
+                    }
+                }
+            }
+
+            var newChildList = [];
+
+            for(let i=0;i<demand.length;i++)
+            {
+                var temp = handleChildProductBatchToCart(demand[i],childList);
+
+                if(temp.length > 0)
+                {
+                    for(let i=0;i<temp.length;i++)
+                    {
+                        var found = false;
+
+                        for(let j=0;j<newChildList.length;j++)
+                        {   
+                            if(temp[i].batchVariantID == newChildList[j].batchVariantID)
+                            {
+                                newChildList[j].quantityOrdered += temp[i].quantityOrdered;
+                                newChildList[j].totalQuantityOrdered = temp[i].totalQuantityOrdered;
+                                newChildList[j].currentInventory = temp[i].currentInventory;
+
+                                found = true;
+                                break;
+                            }
+                        }
+
+                        if(!found)
+                        {
+                            newChildList.push(temp[i]);
+                        }
+                    }
+                }
+            }   
+
+            // displayList = displayList.concat(newChildList);
+
+            for(let i=0;i<newChildList.length;i++)
+            {
+                newChildList[i].voidQuantity = newChildList[i].quantityOrdered;
+                newChildList[i].voidAmount = 0;
+                newChildList[i].refundDiscount = 0;
+                newChildList[i].voidItemsSales = 0;
+                newChildList[i].voidTax = 0;
+            }
+
+            demand = demand.concat(newChildList);
+
+            for(let i=0;i<demand.length;i++)
+            {
+                demand[i].remarksList = await createReturnList(demand[i])
+            }
+
+            console.log('refundsList',demand)
+            // console.log('new child list',newChildList)
+            // console.log('payment list',paymentList)
+
+            var totalItems = 0;
+            totalItems = demand.length;
+            var stockValue = 0;
+            var refundDiscount = 0;
+            var voidItemsSales = 0;
+            var voidTax = 0;
+
+            for(let i=0;i<demand.length;i++)
+            {
+                // totalItems += demand[i].voidQuantity;
+                stockValue += demand[i].voidAmount;
+                refundDiscount += demand[i].refundDiscount
+                voidItemsSales += demand[i].voidItemsSales;
+                voidTax += demand[i].voidTax;
+            }
+
+            stockValue = Math.round(stockValue);
+            refundDiscount = Math.round(refundDiscount * 1000)/1000;
+            voidItemsSales = Math.round(voidItemsSales * 1000)/1000;
+            voidTax = Math.round(voidTax * 1000)/1000;
+
+            var refundPayments = createRefundPayments(stockValue,paymentList);
+
+            for(let i=0;i<refundPayments.length;i++)
+            {
+                paymentGenerator(creditAccountInfo,refundPayments[i],i);
+            }
+
+            createUpdatedPaymentList(updatedPaymentList,refundPayments);
+            var refundPaymentsCopy = JSON.parse(JSON.stringify(refundPayments));
+            orderPayments = createOrderPayments(refundPaymentsCopy);
+
+            console.log('original paymentList',paymentList)
+            console.log('refundPayments',refundPayments)
+            console.log('updatedPaymentList',updatedPaymentList)
+            console.log('orderPayments',orderPayments)
+
+            for(let i=0;i<demand.length;i++)
+            {
+                if(demand[i].quantityOrdered){
+
+                    demand[i].Status = "ORST_PARTIAL_CANCELLED";
+                }
+                else{
+                    demand[i].Status = "ORST_CANCELLED";
+                }
+            }
+
+            refundOrder = {
+                refundsList : demand,
+                refundPayments
+            } 
+
+            $('#finalOrderID').text(order.orderID);   
+            $('#finalStoreName').text(order.storeName);         
+            $('#finalChildPartyCode').text(order.childPartyCode);
+            $('#finalPosDate').text(order.posDate);
+
+            $('#finalTable').bootstrapTable('destroy');
+            $('#finalTable').bootstrapTable({data:demand,
+                                            search:false,
+                                            reinit: true,
+                                            trimOnSearch:false
+            });
+
+            $('#totalItems').text(totalItems);
+            $('#subTotal').text(voidItemsSales);
+            $('#refundDiscount').text(refundDiscount);
+            $('#voidTax').text(voidTax);
+            $('#stockValue').text(stockValue);
+
+            $('#editOrdersSection').css('display','none');
+            $('#finalViewSection').css('display','flex');
+            $('.discounted').css('color','#ba1800')
+        }
+
+        function createRefundPayments(bill,paymentList){
+
+            var x,refundPaymentsList = [];
+            bill = Math.round(bill);
+
+            console.log('gross bill',bill)
+            // console.log('payment list',paymentList)
+
+            // credit note loop
+
+            for(let i=0;i<paymentList.length;i++)
+            {
+                if(bill == 0)
+                {
+                    break;
+                }
+
+                x = paymentList[i];
+
+                if(x.paymentType == 'PAYMENT_CREDIT_NOTE' && x.amount)
+                {
+                    if(bill > x.amount)
+                    {
+                        refundPaymentsList.push({
+                            paymentType: "PAYMENT_CREDIT_NOTE",
+                            amount: -1 * x.amount,
+                            transactionID : x.creditNoteID
+                        })
+
+                        refundPaymentsList.push({
+                            paymentType: "PAYMENT_CREDIT",
+                            amount: x.amount,
+                        })
+
+                        bill = bill - x.amount;
+                    }
+                    else
+                    {
+                        refundPaymentsList.push({
+                            paymentType: "PAYMENT_CREDIT_NOTE",
+                            amount: -1 * bill,
+                            transactionID : x.creditNoteID
+                        })
+
+                        refundPaymentsList.push({
+                            paymentType: "PAYMENT_CREDIT",
+                            amount: bill,
+                        })
+
+                        bill = 0
+                    }
+                }
+
+            }
+
+            if(bill == 0)
+            {
+                return refundPaymentsList;
+            }
+
+            for(let i=0;i<paymentList.length;i++)
+            {
+                x = paymentList[i];
+
+                if(x.paymentType == 'PAYMENT_CASH' && x.amount)
+                {
+                    if(bill > x.amount)
+                    {
+                        refundPaymentsList.push({
+                            paymentType: "PAYMENT_CREDIT_NOTE",
+                            amount: -1 * x.amount,
+                        })
+
+                        bill = bill - x.amount;
+                    }
+                    else
+                    {
+                        refundPaymentsList.push({
+                            paymentType: "PAYMENT_CREDIT_NOTE",
+                            amount: -1 * bill,
+                        })
+
+                        bill = 0;
+                    }
+
+                    break;
+                }
+            }
+
+            return refundPaymentsList;
+        }
+
+        function createUpdatedPaymentList(updatedPaymentList,refundPayments)
+        {
+
+            for(let i=0;i<updatedPaymentList.length;i++)
+            {
+                if(updatedPaymentList[i].paymentType == 'PAYMENT_CREDIT_NOTE')
+                {
+                    for(let j=0;j<refundPayments.length;j++)
+                    {
+                        if(updatedPaymentList[i].creditNoteID == refundPayments[j].transactionID)
+                        {
+                            updatedPaymentList[i].amount -= Math.abs(refundPayments[j].amount); 
+                        }
+                    }
+                }
+            }
+
+            
+            for(let i=0;i<refundPayments.length;i++)
+            {
+                if(refundPayments[i].paymentType == 'PAYMENT_CREDIT_NOTE' && refundPayments[i].transactionID == "")
+                {
+                    for(let j=0;j<updatedPaymentList.length;j++)
+                    {
+                        if(updatedPaymentList[j].paymentType == 'PAYMENT_CASH')
+                        {
+                            updatedPaymentList[j].amount -= Math.abs(refundPayments[i].amount); 
+                            break;
+                        }
+                    }
+
+                    break;
+                }
+            }            
+
+        }
+
+        function createOrderPayments(refundPayments){
+
+            var orderPayments = [];
+
+            for(let i=0;i<refundPayments.length;i++)
+            {
+                if(refundPayments[i].paymentType == 'PAYMENT_CREDIT')
+                {
+                    orderPayments.push(refundPayments[i]);
+                }
+            }
+
+            return orderPayments;
+        }
+
+        function paymentGenerator(account,temp,i){
+               
+            if(temp.transactionID == undefined){
+            
+                temp.transactionID = "";
+            }
+
+            temp.accountId = account.accountID;
+            temp.accountName = account.accountName;
+            temp.accountType = account.accountType;
+            temp.acquiringBankCode = "";
+            // temp.amount = temp.amount;
+            temp.approvalCode = "";
+            temp.cardHolderName = "";
+            temp.cardType = "";
+            temp.expDate = "";
+            temp.lastFourDigits = "";
+            temp.newAmount = 0.0;
+            temp.orderTimeLocal = "";
+            temp.partType = "";
+            temp.partyID = -1;
+            temp.partyName = "";
+            temp.paymentSubID = i + 1;
+            temp.paymentTerminal = "";
+        //    temp.paymentType = account.paymentType;
+        //    temp.transactionID = "";
+            temp.transactionType = "TRN_ORDER_CANCEL";
+            temp.userID = -1;
+            temp.changeAmount = "";
+            temp.tenderedAmount = "";
+            temp.shortAmount = "";
+            temp.tenderedAmountCurrency = "";
+            temp.tenderedAmountCurrencyCF = "";
+            temp.referenceId = "";
+
+        }
+
+        handleDiscountDataForReturn = (demand)=>{
+            let cDiscountsApplicable = discountsApplicable
+            discountProductList = []
+            discountLevelList=[]
+            discountClusters=[]
+            discountDetails=[]
+
+            console.log(discountsApplicable,'discountsApplicable')
+
+            cDiscountsApplicable.map(m=>{
+                discountProductList.push(m.discountProductMap)
+
+                if(m.discountLevel){
+                    discountLevelList = discountLevelList.filter(n=>n.discountID != m.discountID)
+                    discountLevelList.push(...m.discountLevel)
+                }
+                   
+                if(m.discountClusters){
+                    discountClusters = discountClusters.filter(n=>n.discountID != m.discountID)
+                    discountClusters.push(...m.discountClusters)
+                }
+                
+                // delete m.discountLevel;
+                // delete m.discountProductMap;
+                discountDetails.push(m)
+            })
+
+            var demand = handleDiscountToCart(demand,discountProductList,discountLevelList,discountDetails,discountClusters)
+
+            console.log(demand,'demand')
+            return demand
+
+        }
+               
+        function handleDiscountToCart(cartBatchData,discountProductList,discountLevelList,discountDetails){
+
+                console.log(cartBatchData,'cartBatchData')
+                console.log(discountProductList,'discountProductList')
+                console.log(discountLevelList,'discountLevelList')
+                console.log(discountDetails,'discountDetails')
+                
+                var cartBatchDataWithSchemes = cartBatchData
+                var cashDiscArray=[]
+
+                cartBatchDataWithSchemes.map((l)=>{ 
+                    l['discounts'] = []
+                    l['discountValues'] = 0
+                    l['stprDiscountValues'] = 0
+                    l['btprDiscountValues'] = 0
+                    l['stprCashDiscountValues'] = 0
+                }) 
+                            
+                // discountAppliedIDs.map(a=>{
+                    discountProductList.map((b)=>{
+                        appliedDiscountLevel = []
+                        appliedDiscountDetailsObj = {}
+                        appliedDiscountProductMapping = {}
+
+                        // if(a.discountID == b.discountID){
+                            appliedDiscountProductMapping = b
+                            appliedDiscountID = b.discountID
+                            prodArry =  (b.discountProductList).split(",")
+                            batchArry =  (b.discountProdBatchVariantList).split("|")
+                            batchArry.pop()
+                            eligibleQuant = 0;
+                            eligibleValue = 0;
+                            eligibleValueByActualPrice = 0;
+                            eligibleWeight = 0;
+                            eligibleQuantValue = 0;
+                            eligibleTotalWeightValue = 0;
+                            applicableCartBatches = []
+
+                            prodArry.map((c,i)=>{
+                                filteredCartBatches = []
+                                if(c=='ALL'){
+                                    filteredCartBatches = cartBatchDataWithSchemes
+                                }
+                                else{
+                                    if(batchArry[i]=='ALL'){
+                                        filteredCartBatches = cartBatchDataWithSchemes.filter(d=>c==d.productID)
+                                    }
+                                    else{
+                                        if(batchArry[i]){
+                                            eligibleBatchesID = batchArry[i].split(",")
+                                            filteredCartBatches = cartBatchDataWithSchemes.filter(o2 => eligibleBatchesID.some(o1 => o1== o2.batchVarRefID));
+                                        }
+                                    }
+                                }
+                                if(filteredCartBatches.length){
+                                    applicableCartBatches = [...applicableCartBatches,...filteredCartBatches]
+                                }
+                            })
+                            
+                            applicableCartBatches=applicableCartBatches.filter(z=> z.quantityOrdered>0 && z.sbomDesc != "LSBOM-C")
+                            if(applicableCartBatches.length){
+                                console.log(applicableCartBatches,'applicableCartBatches')
+
+                                appliedDiscountDetailsObj = discountDetails.find(f=>f.discountID == appliedDiscountID)
+                                appliedDiscountLevel = discountLevelList.filter(g=>g.discountID ==appliedDiscountID)
+                                
+                                var cumBilledQty;
+                                var billedQty;
+                                var billedValue;
+                                var billSchemeValue;
+                                var discountValue;
+                                var finalDiscountValue;
+
+                                var eligibleAppliedDiscountLevel;
+
+                                if(appliedDiscountDetailsObj.activityClassification=='SECONDARY TPR'){
+                                    appliedDiscountClusters =  discountClusters.filter(y=>y.discountID==appliedDiscountID)
+
+                                    var clusterCount=0;
+                                    var eligibleValue=0;
+                                    var btprApplicableBatches=[]
+                                    appliedDiscountClusters.map(w=>{
+                                        var addCluster = false;
+                                        clusterProdList = (w.productList).split(",")
+                                        applicableCartBatches.map((x)=>{
+                                            if(clusterProdList.indexOf(`${x.productID}`) != -1){
+                                                addCluster = true
+                                                console.log(x.productID,'x.productID',appliedDiscountClusters)
+                                                filteredBtprCartBatches = applicableCartBatches.filter(s=> s.batchVariantID==x.batchVariantID)
+                                                if(filteredBtprCartBatches.length){
+                                                    btprApplicableBatches = [...btprApplicableBatches,...filteredBtprCartBatches]
+                                                }
+                                            }
+                                            // else{
+                                            //     btprApplicableBatches=btprApplicableBatches.filter(s=>s.productID!=x.productID)
+                                            //    // btprApplicableBatches = [...btprApplicableBatches,...filteredBtprBatches]
+                                            // }
+                                        })
+                                        if(addCluster){
+                                            clusterCount++;
+                                        }
+                                    })
+
+                                    if(clusterCount){
+                                        console.log(clusterCount,'clusterCount',btprApplicableBatches)
+                                        eligibleAppliedDiscountLevel = appliedDiscountLevel.find(h=>(clusterCount >= h.fromQuantity &&  clusterCount <= h.toQuantity))
+                                        console.log(eligibleAppliedDiscountLevel,'eligibleAppliedDiscountLevel')
+                                    }
+                                
+                                    if(eligibleAppliedDiscountLevel){
+                                        var discountType = eligibleAppliedDiscountLevel.discountType
+                                        if(discountType == 'PERCENTAGE'){
+                                            btprApplicableBatches.map((j)=>{
+                                                cDiscountDetailsObj = JSON.parse(JSON.stringify(appliedDiscountDetailsObj));
+                                                eligibleValue = j.turPerUnit * j.quantityOrdered
+                                                discountValue =(eligibleValue * eligibleAppliedDiscountLevel.discountValue/ 100);
+
+                                                cDiscountDetailsObj['discountValue'] =  eligibleAppliedDiscountLevel.discountValue
+                                                cDiscountDetailsObj['discountPrice'] = parseFloat(discountValue.toFixed(3))
+                                                cDiscountDetailsObj['btprDiscountValue'] = parseFloat(discountValue.toFixed(3));
+                                                cDiscountDetailsObj['stprDiscountValue'] = 0
+                                                cDiscountDetailsObj['stprCashDiscountValue'] = 0
+                                                cDiscountDetailsObj['discountType'] = 'PERCENTAGE'
+                                                cDiscountDetailsObj['discountLevel'] = appliedDiscountLevel
+                                                cDiscountDetailsObj['discountProductMap'] = appliedDiscountProductMapping
+                                                cDiscountDetailsObj['discountClusters'] = appliedDiscountClusters
+
+                                                if(j.discounts){
+                                                    j.discounts = j.discounts.filter(k=>k.discountID!=cDiscountDetailsObj.discountID)
+                                                    j.discounts = [...(j.discounts),cDiscountDetailsObj]
+                                                }else{        
+                                                    j['discounts'] = [cDiscountDetailsObj]
+                                                }
+                                                discntArry =   j.discounts
+                                                discSum = 0
+                                                btprDiscSum = 0
+                                                discntArry.map(v=>{
+                                                    discSum += v.discountPrice
+                                                    btprDiscSum +=v.btprDiscountValue
+                                                })
+                                                j.discountValues = parseFloat(discSum.toFixed(3))
+                                                j.btprDiscountValues = parseFloat(btprDiscSum.toFixed(3))
+                                            })
+                                            console.log(btprApplicableBatches,'btprApplicableBatches')
+                                        }
+                                    }
+                                }
+                            else{
+                                if(appliedDiscountDetailsObj.isCashDiscount){
+                                    cashDiscArray =cashDiscArray.filter(a=>a.discountID!=appliedDiscountDetailsObj.discountID)
+                                    appliedDiscountDetailsObj['discountLevel'] = appliedDiscountLevel
+                                    appliedDiscountDetailsObj['discountProductMap'] = appliedDiscountProductMapping
+                                    cashDiscArray.push(appliedDiscountDetailsObj)
+                                    console.log(cashDiscArray,'cashDiscArray')
+                                }
+                                else{              
+                                    applicableCartBatches.map(e=>{
+                                        eligibleQuant +=e.quantityOrdered
+                                        eligibleValue +=(e.productBasePrice*e.quantityOrdered)
+                                        eligibleValueByActualPrice +=(e.productActualPrice*e.quantityOrdered)
+                                        eligibleQuantValue +=(e.productBasePrice*e.quantityOrdered)
+                                        if(e.weightUnit == "GMS" || e.weightUnit == "ML"){
+                                            eligibleWeight +=(e.quantityOrdered*e.weight/1000)
+                                            eligibleTotalWeightValue +=(e.productBasePrice*e.weight*e.quantityOrdered/1000)
+                                        }
+                                        else{
+                                            eligibleWeight +=(e.quantityOrdered*e.weight)
+                                            eligibleTotalWeightValue +=(e.productBasePrice*e.weight*e.quantityOrdered) 
+                                        }
+                                    })
+                                    
+                                    var eligibleValueByActualPriceRounded = parseInt(eligibleValueByActualPrice)
+                                    var eligibleWeightRounded = parseInt(eligibleWeight)
+                
+                                        var discountSchemeBasis = appliedDiscountLevel[0].schemeBasis
+                                        switch(discountSchemeBasis){
+                                            case 'UNIT':
+                                            eligibleAppliedDiscountLevel = appliedDiscountLevel.find(h=>(eligibleQuant >= h.fromQuantity &&  eligibleQuant <= h.toQuantity))
+                                            break;
+                    
+                                            case 'VALUE':
+                                            eligibleAppliedDiscountLevel = appliedDiscountLevel.find(h=>(eligibleValueByActualPriceRounded >= h.fromQuantity &&  eligibleValueByActualPriceRounded <= h.toQuantity))
+                                            break;
+                    
+                                            case 'WEIGHT':
+                                            eligibleAppliedDiscountLevel = appliedDiscountLevel.find(h=>(eligibleWeightRounded >= h.fromQuantity &&  eligibleWeightRounded<= h.toQuantity))
+                                            break;
+                                        }
+                                        console.log(discountSchemeBasis,'discountSchemeBasis',eligibleWeight,'eligibleWeight')
+                                        if(eligibleAppliedDiscountLevel){
+                                            if(discountSchemeBasis == 'WEIGHT'){
+                                                var discountType = eligibleAppliedDiscountLevel.discountType
+                        
+                                                cumBilledQty = eligibleWeight;
+                                                billedQty = parseInt(cumBilledQty /eligibleAppliedDiscountLevel.forEvery);
+                        
+                                                cumBilledValue= eligibleQuantValue
+                                                billSchemeValue =(billedQty * eligibleAppliedDiscountLevel.forEvery) * (cumBilledValue / cumBilledQty);
+                                                // billSchemeValue =parseFloat((billedQty * eligibleAppliedDiscountLevel.forEvery) * (cumBilledValue / cumBilledQty).toFixed(3));
+                                                
+                                                totalValue = eligibleTotalWeightValue
+                    
+                                                console.log(eligibleTotalWeightValue,eligibleWeight)
+                                                if(discountType == 'PERCENTAGE'){
+                                                    applicableCartBatches.map((j)=>{
+                                                        cDiscountDetailsObj = JSON.parse(JSON.stringify(appliedDiscountDetailsObj));
+                                                        if(j.weightUnit == "GMS" || j.weightUnit == "ML"  ){
+                                                            lineWeight = j.productBasePrice*j.quantityOrdered*j.weight/1000
+                                                        }
+                                                        else{
+                                                            lineWeight = j.productBasePrice*j.quantityOrdered*j.weight
+                                                        }
+                                                        discountValue =(billSchemeValue * eligibleAppliedDiscountLevel.discountValue/ 100);
+                                                        // discountValue =parseFloat((billSchemeValue * eligibleAppliedDiscountLevel.discountValue/ 100).toFixed(3));
+                                                        finalDiscountValue = (discountValue / totalValue * (lineWeight));
+                                                        cDiscountDetailsObj['discountValue'] =  eligibleAppliedDiscountLevel.discountValue
+                                                        cDiscountDetailsObj['discountPrice'] = parseFloat(finalDiscountValue.toFixed(3));
+                                                        cDiscountDetailsObj['stprDiscountValue'] = parseFloat(finalDiscountValue.toFixed(3));
+                                                        cDiscountDetailsObj['btprDiscountValue'] = 0
+                                                        cDiscountDetailsObj['stprCashDiscountValue'] = 0
+                                                        cDiscountDetailsObj['discountType'] = 'PERCENTAGE'
+                                                        cDiscountDetailsObj['discountLevel'] = appliedDiscountLevel
+                                                        cDiscountDetailsObj['discountProductMap'] = appliedDiscountProductMapping
+                                                        
+                                                        if(j.discounts){
+                                                            j.discounts = j.discounts.filter(k=>k.discountID!=cDiscountDetailsObj.discountID)
+                                                            j.discounts = [...(j.discounts),cDiscountDetailsObj]
+                                                        }else{        
+                                                            j['discounts'] = [cDiscountDetailsObj]
+                                                        }
+                                                        discntArry =   j.discounts
+                                                        discSum = 0
+                                                        stprDiscSum = 0
+                                                        discntArry.map(v=>{
+                                                            discSum += v.discountPrice
+                                                            stprDiscSum += v.stprDiscountValue
+                                                        })
+                                                        j.discountValues = parseFloat(discSum.toFixed(3))
+                                                        j.stprDiscountValues = parseFloat(stprDiscSum.toFixed(3))
+                                                    })
+                                                }
+                                                else if(discountType == 'ABSOLUTE'){
+                                                    applicableCartBatches.map((j)=>{
+                                                        cDiscountDetailsObj = JSON.parse(JSON.stringify(appliedDiscountDetailsObj));
+                                                        if(j.weightUnit == "GMS" || j.weightUnit == "ML" ){
+                                                            lineWeight = j.productBasePrice*j.quantityOrdered*j.weight/1000
+                                                        }
+                                                        else{
+                                                            lineWeight = j.productBasePrice*j.quantityOrdered*j.weight
+                                                        }
+                                                        console.log(lineWeight,'lineWeight')
+                                                        var revereseTax = (j.totalTaxPercentage+100)/100
+                                                        //var revereseTax = parseFloat(((j.totalTaxPercentage+100)/100)).toFixed(3)
+                                                        discountValue = (billedQty * eligibleAppliedDiscountLevel.discountValue/ revereseTax)
+                                                        //discountValue = parseFloat((billedQty * eligibleAppliedDiscountLevel.discountValue/ revereseTax).toFixed(3))
+                                                        finalDiscountValue = (discountValue*lineWeight / cumBilledValue)
+                        
+                                                        cDiscountDetailsObj['discountValue'] =  eligibleAppliedDiscountLevel.discountValue
+                                                        cDiscountDetailsObj['discountPrice'] = parseFloat(finalDiscountValue.toFixed(3))
+                                                        cDiscountDetailsObj['stprDiscountValue'] = parseFloat(finalDiscountValue.toFixed(3))
+                                                        cDiscountDetailsObj['btprDiscountValue'] = 0
+                                                        cDiscountDetailsObj['stprCashDiscountValue'] = 0
+                                                        cDiscountDetailsObj['discountType'] = 'ABSOLUTE'
+                                                        cDiscountDetailsObj['discountLevel'] = appliedDiscountLevel
+                                                        cDiscountDetailsObj['discountProductMap'] = appliedDiscountProductMapping
+                    
+                                                        if(j.discounts){
+                                                            j.discounts = j.discounts.filter(k=>k.discountID!=cDiscountDetailsObj.discountID)
+                                                            j.discounts = [...(j.discounts),cDiscountDetailsObj]
+                                                        }else{        
+                                                            j['discounts'] = [cDiscountDetailsObj]
+                                                        }
+                                                        discntArry =   j.discounts
+                                                        discSum = 0
+                                                        stprDiscSum = 0
+                                                        discntArry.map(v=>{
+                                                            discSum += v.discountPrice
+                                                            stprDiscSum += v.stprDiscountValue
+                                                        })
+                                                        j.discountValues = parseFloat(discSum.toFixed(3))
+                                                        j.stprDiscountValues = parseFloat(stprDiscSum.toFixed(3))
+                                                    })
+                        
+                                                }
+                                            }
+                        
+                        
+                                            else if(discountSchemeBasis == 'VALUE'){
+                                                var discountType = eligibleAppliedDiscountLevel.discountType
+                        
+                                                cumBilledQty = eligibleQuant;
+                                                billedQty = parseInt(cumBilledQty/eligibleAppliedDiscountLevel.forEvery)
+                        
+                                                billedValue = eligibleValueByActualPrice;
+                        
+                                                billSchemeValue = (billedQty * eligibleAppliedDiscountLevel.forEvery * (billedValue / cumBilledQty))
+                                                //billSchemeValue = parseFloat((billedQty * eligibleAppliedDiscountLevel.forEvery * (billedValue / cumBilledQty)).toFixed(3));
+                                                
+                                                if(discountType == 'PERCENTAGE'){
+                                                    applicableCartBatches.map((j)=>{
+                                                        cDiscountDetailsObj = JSON.parse(JSON.stringify(appliedDiscountDetailsObj)); 
+                                                        var linePrice = j.productBasePrice*j.quantityOrdered;
+                        
+                                                        discountValue =(billSchemeValue * eligibleAppliedDiscountLevel.discountValue/ 100)
+                                                        // discountValue =parseFloat((billSchemeValue * eligibleAppliedDiscountLevel.discountValue/ 100).toFixed(3));
+                                                        finalDiscountValue = (discountValue / billedValue * (linePrice))
+                                                        
+                                                        cDiscountDetailsObj['discountValue'] =  eligibleAppliedDiscountLevel.discountValue
+                                                        cDiscountDetailsObj['discountPrice'] =  parseFloat(finalDiscountValue.toFixed(3))
+                                                        cDiscountDetailsObj['stprDiscountValue'] =  parseFloat(finalDiscountValue.toFixed(3))
+                                                        cDiscountDetailsObj['btprDiscountValue'] = 0
+                                                        cDiscountDetailsObj['stprCashDiscountValue'] = 0
+                                                        cDiscountDetailsObj['discountType'] = 'PERCENTAGE'
+                                                        cDiscountDetailsObj['discountLevel'] = appliedDiscountLevel
+                                                        cDiscountDetailsObj['discountProductMap'] = appliedDiscountProductMapping
+                                                        
+                                                        if(j.discounts){
+                                                            j.discounts = j.discounts.filter(k=>k.discountID!=cDiscountDetailsObj.discountID)
+                                                            j.discounts = [...(j.discounts),cDiscountDetailsObj]
+                                                        }else{        
+                                                            j['discounts'] = [cDiscountDetailsObj]
+                                                        }
+                                                        discntArry =   j.discounts
+                                                        discSum = 0
+                                                        stprDiscSum = 0
+                                                        discntArry.map(v=>{
+                                                            discSum += v.discountPrice
+                                                            stprDiscSum += v.stprDiscountValue
+                                                        })
+                                                        j.discountValues = parseFloat(discSum.toFixed(3))
+                                                        j.stprDiscountValues = parseFloat(stprDiscSum.toFixed(3))
+                                                    })
+                                                }
+                                                else if(discountType == 'ABSOLUTE'){
+                                                    applicableCartBatches.map((j)=>{
+                                                        cDiscountDetailsObj = JSON.parse(JSON.stringify(appliedDiscountDetailsObj));
+                                                        var lineQuant =j.quantityOrdered
+                                                        discountValue = (billedQty * eligibleAppliedDiscountLevel.discountValue)
+                                                        //discountValue = parseFloat((billedQty * eligibleAppliedDiscountLevel.discountValue).toFixed(3))
+                                                        finalDiscountValue = (discountValue*lineQuant / cumBilledQty)
+                                                        //finalDiscountValue = parseFloat((discountValue*lineQuant / cumBilledQty).toFixed(3))
+                
+                                                        cDiscountDetailsObj['discountValue'] =  eligibleAppliedDiscountLevel.discountValue
+                                                        cDiscountDetailsObj['discountPrice'] =   parseFloat(finalDiscountValue.toFixed(3))
+                                                        cDiscountDetailsObj['stprDiscountValue'] =  parseFloat(finalDiscountValue.toFixed(3))
+                                                        cDiscountDetailsObj['btprDiscountValue'] = 0
+                                                        cDiscountDetailsObj['stprCashDiscountValue'] = 0
+                                                        cDiscountDetailsObj['discountType'] = 'ABSOLUTE'
+                                                        cDiscountDetailsObj['discountLevel'] = appliedDiscountLevel
+                                                        cDiscountDetailsObj['discountProductMap'] = appliedDiscountProductMapping
+
+                                                        if(j.discounts){
+                                                            j.discounts = j.discounts.filter(k=>k.discountID!=cDiscountDetailsObj.discountID)
+                                                            j.discounts = [...(j.discounts),cDiscountDetailsObj]
+                                                        }else{        
+                                                            j['discounts'] = [cDiscountDetailsObj]
+                                                        }
+                                                        discntArry =   j.discounts
+                                                        discSum = 0
+                                                        stprDiscSum = 0
+                                                        discntArry.map(v=>{
+                                                            discSum += v.discountPrice
+                                                            stprDiscSum += v.stprDiscountValue
+                                                        })
+                                                        j.discountValues = parseFloat(discSum.toFixed(3))
+                                                        j.stprDiscountValues = parseFloat(stprDiscSum.toFixed(3))
+                                                    })
+                        
+                                                }
+                                            }
+                        
+                                            else if(discountSchemeBasis == 'UNIT'){
+                                                var discountType = eligibleAppliedDiscountLevel.discountType
+                        
+                                                cumBilledQty = eligibleQuant;
+                                                billedQty = parseInt(cumBilledQty/eligibleAppliedDiscountLevel.forEvery)
+                        
+                                                billedValue = eligibleValue;
+                        
+                                                billSchemeValue = (billedQty * eligibleAppliedDiscountLevel.forEvery * (billedValue / cumBilledQty))
+                                                //billSchemeValue = parseFloat((billedQty * eligibleAppliedDiscountLevel.forEvery * (billedValue / cumBilledQty)).toFixed(3));
+                                                
+                                                if(discountType == 'PERCENTAGE'){
+                                                    applicableCartBatches.map((j)=>{
+                                                        cDiscountDetailsObj = JSON.parse(JSON.stringify(appliedDiscountDetailsObj));
+                                                        var linePrice = j.productBasePrice*j.quantityOrdered
+                                                        //discountValue =parseFloat((billSchemeValue * eligibleAppliedDiscountLevel.discountValue/ 100).toFixed(3));
+                                                        discountValue =(billSchemeValue * eligibleAppliedDiscountLevel.discountValue/ 100)
+                
+                                                        finalDiscountValue = (discountValue / billedValue * (linePrice))
+                                                        cDiscountDetailsObj['discountValue'] =  eligibleAppliedDiscountLevel.discountValue
+                                                        cDiscountDetailsObj['discountPrice'] =    parseFloat(finalDiscountValue.toFixed(3))
+                                                        cDiscountDetailsObj['stprDiscountValue'] =    parseFloat(finalDiscountValue.toFixed(3))
+                                                        cDiscountDetailsObj['btprDiscountValue'] = 0
+                                                        cDiscountDetailsObj['stprCashDiscountValue'] = 0
+                                                        cDiscountDetailsObj['discountType'] = 'PERCENTAGE'
+                                                        cDiscountDetailsObj['discountLevel'] = appliedDiscountLevel
+                                                        cDiscountDetailsObj['discountProductMap'] = appliedDiscountProductMapping
+
+                                                        if(j.discounts){
+                                                            j.discounts = j.discounts.filter(k=>k.discountID!=cDiscountDetailsObj.discountID)
+                                                            j.discounts = [...(j.discounts),cDiscountDetailsObj]
+                                                        }else{        
+                                                            j['discounts'] = [cDiscountDetailsObj]
+                                                        }
+                                                        discntArry =   j.discounts
+                                                        discSum = 0
+                                                        stprDiscSum = 0
+                                                        discntArry.map(v=>{
+                                                            discSum += v.discountPrice
+                                                            stprDiscSum += v.stprDiscountValue
+                                                        })
+                                                        j.discountValues = parseFloat(discSum.toFixed(3))
+                                                        j.stprDiscountValues = parseFloat(stprDiscSum.toFixed(3))
+                                                    })
+                                                }
+                                                else if(discountType == 'ABSOLUTE'){
+                                                    applicableCartBatches.map((j)=>{
+                                                        cDiscountDetailsObj = JSON.parse(JSON.stringify(appliedDiscountDetailsObj));
+                                                        var lineQuant =j.quantityOrdered
+                                                        var revereseTax = (j.totalTaxPercentage+100)/100;
+                                                        //var revereseTax = parseFloat(((j.totalTaxPercentage+100)/100)).toFixed(3)
+                                                        discountValue = (billedQty * eligibleAppliedDiscountLevel.discountValue/ revereseTax)
+                                                        //discountValue = parseFloat((billedQty * eligibleAppliedDiscountLevel.discountValue/ revereseTax).toFixed(3))
+                                                        finalDiscountValue = (discountValue*lineQuant / cumBilledQty)
+                                                        //finalDiscountValue = parseFloat((discountValue*lineQuant / cumBilledQty).toFixed(3))
+                                                        
+                                                        cDiscountDetailsObj['discountValue'] =  eligibleAppliedDiscountLevel.discountValue
+                                                        cDiscountDetailsObj['discountPrice'] = parseFloat(finalDiscountValue.toFixed(3))
+                                                        cDiscountDetailsObj['stprDiscountValue'] = parseFloat(finalDiscountValue.toFixed(3))
+                                                        cDiscountDetailsObj['btprDiscountValue'] = 0
+                                                        cDiscountDetailsObj['stprCashDiscountValue'] = 0
+                                                        cDiscountDetailsObj['discountType'] = 'ABSOLUTE'
+                                                        cDiscountDetailsObj['discountLevel'] = appliedDiscountLevel
+                                                        cDiscountDetailsObj['discountProductMap'] = appliedDiscountProductMapping
+                                                        
+                                                        if(j.discounts){
+                                                            j.discounts = j.discounts.filter(k=>k.discountID!=cDiscountDetailsObj.discountID)
+                                                            j.discounts = [...(j.discounts),cDiscountDetailsObj]
+                                                        }else{        
+                                                            j['discounts'] = [cDiscountDetailsObj]
+                                                        }
+                                                        discntArry =   j.discounts
+                                                        discSum = 0
+                                                        stprDiscSum = 0
+                                                        discntArry.map(v=>{
+                                                            discSum += v.discountPrice
+                                                            stprDiscSum += v.stprDiscountValue
+                                                        })
+                                                        j.discountValues = parseFloat(discSum.toFixed(3));
+                                                        j.stprDiscountValues = parseFloat(stprDiscSum.toFixed(3));
+                                                    })
+                        
+                                                }
+                                            }
+                                        }
+                                        else{
+                                            applicableCartBatches.map((l)=>{ 
+                                                cDiscountDetailsObj = JSON.parse(JSON.stringify(appliedDiscountDetailsObj));
+                                                if(l.discounts){
+                                                    l.discounts = l.discounts.filter(m=>m.discountID!=cDiscountDetailsObj.discountID)     
+                                                }
+                                                else{
+                                                    l['discounts'] = []
+                                                }
+                                                l['discountValues'] = 0
+                                                l['stprDiscountValues'] = 0
+                                                l['btprDiscountValues'] = 0
+                                                l['stprCashDiscountValue'] = 0
+                                            })          
+                                        }
+                                    }
+                                }
+                            }
+                        // else{
+                        //         applicableCartBatches.map((l)=>{ 
+                        //             cDiscountDetailsObj = JSON.parse(JSON.stringify(appliedDiscountDetailsObj));
+                        //             if(l.discounts){
+                        //                 l.discounts = l.discounts.filter(m=>m.discountID!=cDiscountDetailsObj.discountID)     
+                        //             }
+                        //             else{
+                        //                 l['discounts'] = []
+                        //             }
+                        //             l['discountValues'] = 0
+                        //             l['stprDiscountValues'] = 0
+                        //             l['btprDiscountValues'] = 0
+                        //             l['stprCashDiscountValue'] = 0
+                        //         })          
+                        //     }
+                        //}
+                    })
+                //})
+
+                console.log(cartBatchDataWithSchemes,'cartBatchDataWithSchemes')
+                if(cashDiscArray.length){
+                    var cartBatchDataWithCashSchemes =  handleCashDiscount(cartBatchDataWithSchemes,cashDiscArray)
+                    return cartBatchDataWithCashSchemes
+                }
+                return cartBatchDataWithSchemes
+            }
+
+        handleCashDiscount=(cartBatchDataWithSchemes,cashDiscArray)=>{
+            var filteredCartBatchDataWithSchemes=cartBatchDataWithSchemes.filter(z=> z.quantityOrdered>0 && z.sbomDesc != "LSBOM-C")
+
+            filteredCartBatchDataWithSchemes.map((a)=>{
+                a['cashBasePrice'] = (a.productBasePrice)-(a.stprDiscountValues/a.quantityOrdered)
+
+                cashDiscArray.map(b=>{
+                    if(b.discountType=="PERCENTAGE"){
+                        cCashDiscountObj = JSON.parse(JSON.stringify(b));        
+                        cCashDiscountObj['discountValue'] =  cCashDiscountObj.discountValue
+                        cCashDiscountObj['discountPrice'] =  parseFloat(((a.cashBasePrice*cCashDiscountObj.discountValue)/100 * a.quantityOrdered).toFixed(3)) 
+                        cCashDiscountObj['stprCashDiscountValue'] =  parseFloat(((a.cashBasePrice*cCashDiscountObj.discountValue)/100 * a.quantityOrdered).toFixed(3)) 
+                        cCashDiscountObj['stprDiscountValue'] = 0
+                        cCashDiscountObj['btprDiscountValue'] = 0
+                        if(a.discounts){
+                            a.discounts = a.discounts.filter(k=>k.discountID!=b.discountID)
+                            a.discounts = [...(a.discounts),cCashDiscountObj]
+                        }else{        
+                            a['discounts'] = [cCashDiscountObj]
+                        }
+                    } 
+                    if(b.discountType=="ABSOLUTE"){
+                        cCashDiscountObj = JSON.parse(JSON.stringify(b));        
+                        cCashDiscountObj['discountValue'] =  cCashDiscountObj.discountValue
+                        cCashDiscountObj['discountPrice'] =  parseFloat((cCashDiscountObj.discountValue * a.quantityOrdered).toFixed(3)) 
+                        cCashDiscountObj['stprCashDiscountValue'] =  parseFloat((cCashDiscountObj.discountValue * a.quantityOrdered).toFixed(3))  
+                        cCashDiscountObj['stprDiscountValue'] =  0;
+                        cCashDiscountObj['btprDiscountValue'] = 0;
+                        if(a.discounts){
+                            a.discounts = a.discounts.filter(k=>k.discountID!=b.discountID)
+                            a.discounts = [...(a.discounts),cCashDiscountObj]
+                        }else{        
+                            a['discounts'] = [cCashDiscountObj]
+                        }
+                    } 
+                })
+                discntArry =   a.discounts
+                discSum = 0
+                stprDiscSum = 0
+                discntArry.map(v=>{
+                    discSum += v.discountPrice
+                    stprDiscSum += v.stprCashDiscountValue
+                })
+                a.discountValues = parseFloat(discSum.toFixed(3))
+                a.stprCashDiscountValues = parseFloat(stprDiscSum.toFixed(3))
+            })
+            return cartBatchDataWithSchemes
+        }
+
+        function taxCalculator(productList){
+
+            for(let i=0;i<productList.length;i++)
+            {
+   
+                if(productList[i].productBasePrice){
+                    productList[i].itemSales = productList[i].productBasePrice * productList[i].quantityOrdered;
+                    productList[i].taxableValue = productList[i].itemSales - (productList[i].stprDiscountValues + productList[i].stprCashDiscountValues );      
+                    productList[i].totalTaxValue = productList[i].taxableValue * productList[i].totalTaxPercentage/100;
+                    productList[i].productValue = productList[i].taxableValue + productList[i].totalTaxValue - productList[i].btprDiscountValues;
+                    productList[i].productValue = Math.round(productList[i].productValue * 1000)/1000;
+                }
+                else{
+                    productList[i].itemSales = 0;
+                    productList[i].taxableValue = 0;      
+                    productList[i].totalTaxValue = 0;
+                    productList[i].productValue = 0;
+                }
+
+                for(let j=0;j<productList[i].taxes.length;j++){
+                
+                    let x = productList[i].taxes[j].taxPercentage;  
+                    let tax = productList[i].taxableValue;
+
+                    let y = tax * x/100;
+
+                    productList[i].taxes[j].taxValue = Math.round(y * 100)/100;
+                }
+            }
+        }
+
+        function assignChildQuantity(x){
+
+            if(x.quantityOrdered >= x.parentSkuQty){
+
+                childQuantityOrdered = Math.floor(x.quantityOrdered/x.parentSkuQty) * x.childSkuQty;
+                x.childQuantityOrdered = childQuantityOrdered;
+            }
+            else{
+                x.childQuantityOrdered = 0;
+            }
+        }
+        
+        function handleChildProductBatchToCart(m,childBatches){
+            
+            var temp = [];
+
+            if(m.sbomDesc == "LSBOM-P" && m.voidQuantity>=m.parentSkuQty){
+
+                var i = Math.floor(m.voidQuantity/m.parentSkuQty);
+                var maxUnitLimit = i*m.childSkuQty;
+
+                var data = childBatches.filter(child=>child.serialNumber == m.cpLinkage && child.currentInventory>0);
+
+                if(data.length == 0){
+                    return;
+                }
+
+                data.sort(function(a,b){
+                    return new Date(a.manufacturingDate) - new Date(b.manufacturingDate);
+                });
+
+                console.log(maxUnitLimit)
+
+                data.map(n=>{
+
+                    if(maxUnitLimit == 0){
+                        return;
+                    }
+
+                    if(maxUnitLimit>n.currentInventory){
+                        n.quantityOrdered = n.inventory;
+                        n.totalQuantityOrdered += n.inventory;
+                        n.currentInventory = 0;
+                        maxUnitLimit = maxUnitLimit-n.inventory;
+                    }
+                    else{
+                        n.quantityOrdered = maxUnitLimit;
+                        n.totalQuantityOrdered += maxUnitLimit
+                        n.currentInventory = n.currentInventory - maxUnitLimit;
+                        maxUnitLimit = 0;
+                    }
+                })
+
+                data.map(n=>{
+
+                    if(n.totalQuantityOrdered > 0){
+                        var x = $.extend(true,{},n);
+                        temp.push(x);
+                    }
+                })
+
+                console.log(temp)
+            }
+
+            return temp;
+        }
+
+        async function createReturnList(batch){
+
+            var remarksList = [],x;
+            var category = [],brand = [];
+
+            if(batch.categoryID == undefined || batch.brandID == undefined){
+                
+                await new Promise((resolve,reject)=>{
+
+                    db.get(`SELECT brandID,categoryID FROM products WHERE productID = ${batch.productID}`,function(err,data){
+
+                        if(err){
+                            console.log(err)
+                        }
+                        else{
+                            console.log(data)
+                            batch.categoryID = data.categoryID;
+                            batch.brandID = data.brandID;
+                            resolve();
+                        }
+                    })
+                })
+            }
+
+            for(let i=0;i<damage.length;i++)
+            {
+                if(damage[i].brandList.toLowerCase() == 'all' && damage[i].categoryID.toLowerCase() == 'all'){
+                    // console.log(damage[i])
+                    // x = damage[i];
+                    remarksList.push(damage[i])
+                    break;
+                }else if(batch.categoryID == damage[i].categoryID && damage[i].brandList.toLowerCase() == 'all'){
+
+                    category.push(damage[i])
+                    remarksList.push(damage[i])
+                }else if(batch.categoryID == damage[i].categoryID && damage[i].brandList.indexOf(",") != -1){
+                    let tempBrandArr = damage[i].brandList.split(",");
+                    let lCount = tempBrandArr.length;
+
+                    for (let g = 0; g < lCount; g++) {
+                        const brandListID = tempBrandArr[g];
+                        if(batch.brandID == brandListID){
+                            remarksList.push(damage[i]);
+                            break;  
+                        }
+                        
+                    }
+                }else if(batch.categoryID == damage[i].categoryID && damage[i].brandList.indexOf(",") == -1){
+                    let tempBrandID = damage[i].brandList;
+                    if(batch.brandID == tempBrandID){
+                        remarksList.push(damage[i]);
+                    }
+                }
+            }
+            
+            // console.log('batch',batch)
+            console.log('remarksList',remarksList);
+
+            if(remarksList.length == 0){
+
+                batch.voidRemarks = "";
+                return "";
+            }
+
+            batch.voidRemarks = remarksList[0].damageClaimTypeDescription;
+
+            var select = '<select id=select-'+batch.batchVariantID+' onchange=handleRemarkChange(this) class="selectStyleSS">';
+            var option;
+
+            for(let i=0;i<remarksList.length;i++)
+            {
+                option = '<option value='+remarksList[i].damageClaimTypeID+'>'+remarksList[i].damageClaimTypeDescription+'</option>'
+                select += option;
+            }
+
+            select += '</select>';
+
+            // console.log(select)
+
+            return select;
+        }
+
+        function handleRemarkChange(element){
+
+            var batchID = element.id;
+            var value = element.value;
+            var damageClaimTypeDescription;
+
+            batchID = batchID.substr(7,batchID.length);
+
+            console.log(batchID)
+            console.log(value)
+
+            for(let i=0;i<damage.length;i++)
+            {
+                if(damage[i].damageClaimTypeID == value){
+
+                    damageClaimTypeDescription = damage[i].damageClaimTypeDescription;
+                    break;
+                }
+            }
+
+            console.log(damageClaimTypeDescription)
+
+            for(let i=0;i<demand.length;i++)
+            {
+                if(batchID == demand[i].batchVariantID){
+
+                    demand[i].voidRemarks = damageClaimTypeDescription;
+                    console.log(demand[i])
+                    break;
+                }
+            }
+
+        }
+   
+        async function confirm(){
+
+            // $('#confirm').attr('disabled',true);
+            if(disabled){
+                console.log('disabled')
+                return false;
+            }
+            else{
+                disabled = true;
+            }
+
+            var finalOrder = {};
+
+            var refundsList = refundOrder.refundsList;
+            var voidAmount = 0;
+            var sales = 0;
+            var taxes = 0;
+            var netBill = 0;
+            var grossBill = 0;
+            var discountValue = 0;
+            var refundDiscount = 0;
+            var oldGrossBill;
+            var oldVoidAmount;
+            var found = false;
+
+            for(let i=0;i<refundsList.length;i++)
+            {
+                voidAmount += refundsList[i].voidAmount;
+                sales += refundsList[i].itemSales;
+                taxes += refundsList[i].totalTaxValue;
+                netBill += refundsList[i].taxableValue;
+                grossBill += refundsList[i].productValue;
+                discountValue += refundsList[i].discountValues;
+                refundDiscount += refundsList[i].refundDiscount;
+            }
+
+            oldGrossBill = grossBill;
+            grossBill = Math.round(grossBill);
+
+            var rounding =  grossBill - oldGrossBill;
+            rounding = Math.round(rounding * 100)/100;
+
+            oldVoidAmount = voidAmount;
+            voidAmount = Math.round(voidAmount);
+
+            var voidRounding = voidAmount - oldVoidAmount;
+            voidRounding = Math.round(voidRounding * 100)/100;
+
+            sales = Math.round(sales * 1000)/1000;
+            taxes = Math.round(taxes * 1000)/1000;
+            netBill = Math.round(netBill * 1000)/1000;
+            discountValue = Math.round(discountValue * 1000)/1000;
+            refundDiscount = Math.round(refundDiscount * 1000)/1000;
+
+            refundOrder.voidAmount = voidAmount;
+            refundOrder.sales = sales;
+            refundOrder.taxes = taxes;
+            refundOrder.netBill = netBill;
+            refundOrder.grossBill = grossBill;
+            refundOrder.rounding = rounding;
+            refundOrder.voidRounding = voidRounding;
+            refundOrder.discountValue = discountValue;
+
+            refundOrder.source = 'DESKTOP';
+
+            var refundNetBill = order.orderInformation.netBill - refundOrder.netBill;
+            var refundTaxes = order.orderInformation.taxes - refundOrder.taxes;            
+            // var refundDiscount = order.orderInformation.discountValue - refundOrder.discountValue;
+            
+            refundNetBill = Math.round(refundNetBill * 1000)/1000;
+            refundTaxes = Math.round(refundTaxes * 1000)/1000;
+            // refundDiscount = Math.round(refundDiscount * 1000)/1000;
+
+            refundOrder.refundNetBill = refundNetBill;
+            refundOrder.refundTaxes = refundTaxes;
+            refundOrder.refundDiscount = refundDiscount;
+    
+            
+
+            date = moment().format('YYYY-MM-DD','Asia/Kolkata');
+            var orderTime = date + ' ' + new Date().toLocaleTimeString();
+
+            refundOrder.additionalCharges = [];
+            refundOrder.customers = [];
+            refundOrder.customers.push(order.customerInfo);
+
+            refundOrder.deviceID = deviceID;
+            refundOrder.isLoyaltyPaymentUsed = 0;
+            refundOrder.orderID = order.orderID;
+            refundOrder.paymentType = "";
+            refundOrder.posDate = date;
+            refundOrder.productAdditionalCharge = 0;
+
+            // need to add this
+            var counter = localStorage.getItem('refundOrderID');
+            counter = parseInt(counter,10) + 1;
+            localStorage.setItem('refundOrderID',counter);
+            refundOrder.refundOrderID = "REF-"+deviceID+"-"+counter;
+            //
+
+            for(let i=0;i<refundsList.length;i++)
+            {
+                refundsList[i].accountList = [];
+                refundsList[i].voidTimeLocal = orderTime;
+                refundsList[i].voidQuantityCost = refundsList[i].turPerUnit * refundsList[i].voidQuantity;
+                refundsList[i].voidQuantityCost = Math.round(refundsList[i].voidQuantityCost * 100)/100;
+            }
+
+            var productList = order.orderInformation.productsList;
+            var totalItems,updatedStatus;
+
+            for(let i=0;i<refundsList.length;i++)
+            {
+                for(let j=0;j<productList.length;j++)
+                {
+                    if(refundsList[i].batchVariantID == productList[j].batchVariantID)
+                    {
+                        productList[j] = refundsList[i];
+                        break;
+                    }
+                }
+            }
+
+            productList = productList.filter(p=>{
+
+                if(p.quantityOrdered){
+                    return p;
+                }
+            }) 
+
+            totalItems = productList.length;
+
+            if(totalItems){
+            
+                updatedStatus = "ORST_PARTIAL_CANCELLED";
+            }
+            else{
+                updatedStatus = "ORST_CANCELLED";
+            }
+
+            refundOrder.Status = updatedStatus;
+            refundOrder.refundSettledTime = orderTime;
+            refundOrder.roundingUpdate = [];
+            refundOrder.timezone = "Asia/Kolkata";
+            refundOrder.totalChargeValue = 0;
+            refundOrder.userName = phoneNumber;
+            refundOrder.voidRemarks = "";
+            refundOrder.voidTimeLocal = orderTime;
+            refundOrder.voidUserID = userID;
+            refundOrder.finalCustomerID = order.customerID;
+            refundOrder.finalCustomerAccountID = order.customerInfo.accountID;
+            refundOrder.finalCustomerAccountName = order.customerInfo.accountName;
+
+            var refundPayments = refundOrder.refundPayments;
+
+            for(let i=0;i<refundPayments.length;i++)
+            {
+                refundPayments[i].posDate = date;
+            }
+
+            finalOrder.orderJSON = refundOrder;
+            finalOrder.orderId = order.orderID;
+            finalOrder.deviceId = deviceID;
+            finalOrder.storeID = storeID;
+
+            console.log('original order',order)
+            console.log('void order',finalOrder);
+
+            finalOrder = JSON.stringify(finalOrder);
+
+            var statements = [];
+
+            statements.push(`INSERT INTO voidOrderInformation (orderID,isSync,sales,refundDiscount,orderTime,customerID,childPartyCode,posDate,isError,errorMessage,voidAmount,orderInformation) VALUES`
+                +
+            `('${refundOrder.orderID}',0,'${refundOrder.sales}','${refundOrder.refundDiscount}','${orderTime}','${order.customerID}','${order.childPartyCode}','${date}','','','${refundOrder.voidAmount}','${finalOrder}')`
+            )
+
+            // console.log('refundsList',refundsList)
+
+            for(let i=0;i<refundsList.length;i++)
+            {                
+                query = await batchUpdater(refundsList[i]);
+                statements.push(query);
+            }
+
+
+            sales = 0;
+            taxes = 0;
+            netBill = 0;
+            grossBill = 0;
+            discountValue = 0;
+
+
+            var totalCashDiscount = 0
+            var allDiscountsArray = []
+
+            for(let i=0;i<productList.length;i++)
+            {
+                sales += productList[i].itemSales;
+                taxes += productList[i].totalTaxValue;
+                netBill += productList[i].taxableValue;
+                grossBill += productList[i].productValue;
+                discountValue += productList[i].discountValues;
+
+                // new code
+
+                var discArr = productList[i].discounts;
+                allDiscountsArray.push(...discArr)
+
+                discArr.map(n=>{
+                    if(n.isCashDiscount == 1){
+                    totalCashDiscount += n.discountPrice
+                    }
+                })
+
+                //
+            }
+
+            totalCashDiscount = parseFloat(totalCashDiscount.toFixed(3))
+            var allAppliedDisounts = [];
+
+            discountDetails.map(a=>{
+                var discTotal = 0
+                var sDisc = []
+                var obj;
+                sDisc = allDiscountsArray.filter(b=>b.discountID == a.discountID)
+                sDisc.map(c=>{
+                discTotal += c.discountPrice
+                discTotal = parseFloat(discTotal.toFixed(3))
+                obj = {...c,'discountPrice':discTotal}
+                })
+                if(obj){
+                    allAppliedDisounts.push(obj)
+                }
+            })
+
+            console.log(allAppliedDisounts,'allAppliedDisounts')
+
+            sales = Math.round(sales * 1000)/1000;
+            taxes = Math.round(taxes * 1000)/1000;
+            netBill = Math.round(netBill * 1000)/1000;
+            discountValue = Math.round(discountValue * 1000)/1000;
+
+            oldGrossBill = grossBill;
+            grossBill = Math.round(grossBill);
+
+            rounding =  grossBill - oldGrossBill;
+            rounding = Math.round(rounding * 100)/100;
+
+            // voidAmount = Math.round(voidAmount);
+            // var originalPaymentList = order.orderInformation.paymentList;
+            // var paymentList = createUpdatedPaymentList(voidAmount,originalPaymentList);
+
+
+            for(let i=0;i<updatedPaymentList.length;i++)
+            {
+                updatedPaymentList[i].paymentSubID = i+1;          
+                updatedPaymentList[i].orderTimeLocal = orderTime;  
+                updatedPaymentList[i].posDate = date;       
+            }
+
+            for(let i=0;i<orderPayments.length;i++)
+            {
+                orderPayments[i].paymentSubID = i+1;      
+                orderPayments[i].orderTimeLocal = orderTime; 
+                orderPayments[i].posDate = date;
+
+                paymentSubID = orderPayments[i].paymentSubID;
+                posDate = orderPayments[i].posDate;
+                paymentType = orderPayments[i].paymentType;
+                amount = orderPayments[i].amount;
+
+                statements.push(`INSERT INTO OrderPayments (orderID,customerID,childPartyCode,paymentSubID,posDate,paymentType,orderTime,amount) VALUES `+
+                `('${order.orderID}',${order.customerID},'${order.childPartyCode}',${paymentSubID},'${posDate}','${paymentType}','${orderTime}','${amount}')`)            
+            }
+
+            console.log('orderPayments',orderPayments)
+            // console.log('new payment list',paymentList)
+            // console.log('return payments',orderPayments)
+
+            var orderInformation = {
+                chainID:1,
+                orderID: order.orderInformation.orderID,
+                currency:'INR',
+                currencyCode:"INR",
+                customers: order.orderInformation.customers,
+                timezone:'Asia/Kolkata',
+                userName: order.orderInformation.userName,
+                deviceID,
+                netBill,
+                mocID: order.orderInformation.mocID,
+                sales,
+                paymentStatus:"PAID",
+                orderType:"MARKET_ORDER",
+                deliveryStatus:"DELIVERED",
+                PINumber: order.orderInformation.PINumber,
+                partyCode: order.orderInformation.partyCode,
+                salCode: order.orderInformation.salCode,
+                isOrderRounded:1,
+                billingUsername: order.orderInformation.billingUsername,
+                loyaltyID:-1,
+                loyaltyPointsRedeemed:0,
+                posDate: order.orderInformation.posDate,
+                batchID:'',
+                invoiceNumber:"",
+                discountValue,
+                discounts:allAppliedDisounts,
+                totalCashDiscount,
+                isOpenBill:0,
+                openBill:[],
+                additionalCharges:[],
+                totalProductLevelAdditionalCharges:0,
+                totalChargeValue:0,
+                isNoCharge:0,
+                rounding,
+                grossBill,
+                paymentList : updatedPaymentList,
+                refundPayments:[],  
+                customerIDs: order.orderInformation.customerIDs,
+                orderCreationTimeLocal:date,
+                cashTendered:0,
+                changeAmount:0,
+                orderRemarks:"",
+                numReceiptPrints:1,
+                Status: updatedStatus,
+                productsList: productList,
+                billSettledTimeLocal:orderTime,
+                taxes:taxes,
+                sourceID : order.orderInformation.sourceID,
+                totalItems,
+                isSync : 0,
+                voucherID : -1
+            }
+
+            console.log('updated order Info',orderInformation)
+
+            orderInformation = JSON.stringify(orderInformation);
+
+            query = `UPDATE updatedOrderInformation SET isSync = 0, orderTime = '${orderTime}', netSale = '${netBill}', sales = '${sales}', discountValue = '${discountValue}', grossSale = '${grossBill}', totalTaxes = '${taxes}', rounding = '${rounding}', Status = '${updatedStatus}', totalItems = '${totalItems}', orderInformation = '${orderInformation}' WHERE orderID = '${order.orderID}'`;
+
+            statements.push(query)
+            
+            // console.log(statements)
+
+            await new Promise((resolve,reject)=>{
+                    
+                db.runBatchAsync(statements)
+                .then((result)=>{
+                    resolve();
+                })
+                .catch((error)=>{
+                    console.log(error)
+                })
+            })
+            
+            var billTime = order.orderTime;
+            date = new Date(billTime).toUTCString();
+            time = new Date(date).toLocaleTimeString();
+
+            date = date.substr(0,date.length - 12)
+            billTime = date + time;
+
+            var voidTimeLocal = refundOrder.voidTimeLocal;
+            date = new Date(voidTimeLocal).toUTCString();
+            time = new Date(date).toLocaleTimeString();
+
+            date = date.substr(0,date.length - 12)
+            voidTimeLocal = date + time;
+            
+            $('#billNo').text(refundOrder.orderID);
+            $('#billAmount').text(refundOrder.grossBill);
+            $('#returnAmount').text(refundOrder.voidAmount);
+            $('#billTime').text(billTime);
+            $('#returnTime').text(voidTimeLocal);
+            $('#returnDiscount').text(refundOrder.refundDiscount);
+
+            $('#returnModal').modal('show');
+        }
+
+        async function batchUpdater(x){
+
+            var batchQuery;
+
+            if(x.voidRemarks == "GOODS-STOCK")
+            {
+                batchQuery = `UPDATE batchProductVariants SET inventory = inventory + ${x.voidQuantity},inventoryCost = inventoryCost + ${x.voidQuantityCost} WHERE batchVariantID = ${x.batchVariantID}`
+            }
+            else{
+
+                var found = false;
+               
+                await new Promise((resolve,reject)=>{
+
+                    db.get(`SELECT * FROM cw_productBatchVariant WHERE batchVariantID = ${x.batchVariantID}`,function(err,data){
+
+                        if(data){
+
+                            found = true;
+                            resolve();
+                        }
+                        else{
+                            resolve();
+                        }
+                    })
+                })
+
+
+                if(found){
+                    batchQuery = `UPDATE cw_productBatchVariant SET inventory = inventory + ${x.voidQuantity},inventoryCost = inventoryCost + ${x.voidQuantityCost} WHERE batchVariantID = ${x.batchVariantID}`
+                }
+                else{
+
+                    var y = await new Promise((resolve,reject)=>{
+
+                        db.get(`SELECT * FROM batchProductVariants WHERE batchVariantID = ${x.batchVariantID}`,function(err,data){
+
+                            if(data){
+                                // console.log(data)
+                                resolve(data);
+                            }
+                        })
+                    })
+
+                    console.log(y)
+
+                    batchQuery = `INSERT INTO cw_productBatchVariant (batchVariantID, productID, variantID, batchVariantName, productName, variantName, barcode, batchVarRefID, serialNumber, remarks, manufacturingDate, expiryDate, sbomFlag, sbomDesc, inventory, inventoryCost) VALUES `+
+                    `(${y.batchVariantID},${y.productID},${y.variantID},'${y.batchVariantName}','${y.productName}','${y.variantName}','${y.barcode}','${y.batchVarRefID}','${y.serialNumber}','${x.voidRemarks}','${y.manufacturingDate}','${y.expiryDate}',${y.sbomFlag},'${y.sbomDesc}',${x.voidQuantity},${x.voidQuantityCost})`;
+                }
+
+            }
+
+            // console.log(batchQuery)
+            return batchQuery;
+        }
+
+        function closeModal(element){
+
+            var id = '#' + $(element).data('target');
+            $(id).modal('hide');
+        }
+
+        function finalDelete(){
+
+            $(deleteID).remove();
+            $('#deleteModal').modal('hide');
+        } 
+
+        sqlite3.Database.prototype.runAsync = function (sql, ...params) {
+                return new Promise((resolve, reject) => {
+                    this.run(sql, params, function (err) {
+                        if (err) return reject(err);
+                        resolve(this);
+                    });
+                });
+            };
+
+        sqlite3.Database.prototype.runBatchAsync = function (statements) {
+            var results = [];
+            var batch = ['BEGIN', ...statements, 'COMMIT'];
+            console.log(batch);
+            return batch.reduce((chain, statement) => chain.then(result => {
+                results.push(result);
+                return db.runAsync(...[].concat(statement));
+            }), Promise.resolve())
+            .catch(err => db.runAsync('ROLLBACK').then(() => Promise.reject(err +
+                ' in statement #' + results.length)))
+            .then(() => results.slice(2));
+        };
+
+        </script>
+
+    </body>
+
+</html>

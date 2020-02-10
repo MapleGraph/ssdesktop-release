@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		 <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+		<script type="text/javascript" src="../../loadCSS.js"></script>
+		<script type="text/javascript" src="../../helpers/apiCall.js"></script>
+		<script type="text/javascript" src="../../loadJS.js"></script>
+		<script>
+			window.$ = window.jQuery = require('../../node_modules/jquery/dist/jquery.min.js')
+			const {dialog} = require('electron').remote
+		</script>
+		<style type="text/css">
+	
+
+			.countBadge{
+				width: 48px;
+				height: 48px;
+				border-radius:100%;
+				box-shadow: 0 2px 8px 0 rgba(174, 174, 174, 0.51);
+				background-color: #0e9d58;
+				justify-content:center;
+				position:absolute;
+				top:-20px;
+				right:-20px;
+			}
+		
+			.inventoryText {
+        		font-weight: bold;
+        	}
+			.viewCard{
+				width: 104px;
+				height: 32px;
+				border-radius: 24px;
+				background-color: #1766a6;
+				justify-content: center
+        	}
+
+		
+		</style>
+	</head>
+	<body class="menubar-hoverable header-fixed menubar-pin menubar-first" onload="getDraftCount()">
+        <div class='headerDiv' w3-include-html="../header.html"></div>
+		<div id="base">
+			<div id="sidebar" w3-include-html="../sidebar.html"></div>
+			<!-- BEGIN OFFCANVAS LEFT -->
+			<div class="offcanvas">
+			</div><!--end .offcanvas-->
+			<!-- END OFFCANVAS LEFT -->
+
+			<div id="content">
+				<div class="margin-40 flex-row">
+					<img src="../../assets/img/place-order-rs.png"/>
+					<div class="flex-column" style="padding-left: 20px">
+						<div class="big_header">
+							Place Order/Return to RS
+						</div>
+					</div>
+				</div>
+				<section>
+					<div class="section-body">
+						<div class='flex-row' style="flex-wrap: wrap">
+							<a class='card cardLink' id="addNewOrder"  href="placeNewOrder.html">
+								<img   class='inventoryIcon' src="../../assets/img/place-new-order.svg">
+								<span class='inventoryText'>Place New Order</span>
+								<span class="viewCard flex-row text_16_500_fff">
+									View
+								</span>
+							</a>
+							<a class='card cardLink'   href="" id="draftCount">
+								<img  class='inventoryIcon' src="../../assets/img/view-order-drafts.svg">
+								<span class="badge badge-success countBadge  flex-row text_24_500_fff" id='draftCountBadge' style = "display:none">0</span>
+								<span class='inventoryText'>View Order Draft</span>
+								<span class="viewCard flex-row text_16_500_fff">
+									View
+								</span>
+							</a>
+							<a class='card cardLink' href="placedOrders.html">
+								<img class='inventoryIcon' src="../../assets/img/view-placed-order.svg">
+								<span class='inventoryText'>View Placed Orders</span>
+								<span class="viewCard flex-row text_16_500_fff">
+										View
+									</span>
+							</a>
+							<a class='card cardLink' href="receivedStock.html">
+								<img  class='inventoryIcon' src="../../assets/img/view-received-stock.svg">
+								<span class='inventoryText'>View Received Stocks</span>
+								<span class="viewCard flex-row text_16_500_fff">
+										View
+									</span>
+							</a>
+							<a class='card cardLink' href="returnedStock.html">
+								<img  class='inventoryIcon' src="../../assets/img/view-returns.svg">
+								<span class='inventoryText'>View Returns</span>
+								<span class="viewCard flex-row text_16_500_fff">View</span>
+							</a>
+							<a class='card cardLink' href="javascript:void(0)" id='pendingDeliveryCount' onclick="getUrl()">
+								<img class='inventoryIcon' src="../../assets/img/pending-delivery-confirmation.svg">
+								<span class="badge badge-success countBadge flex-row text_24_500_fff" id='pendingDeliveryCountBadge' style = "display:none">0</span>
+								<span class='inventoryText'>Pending Delivery Confirmation</span>
+								<span class="viewCard flex-row text_16_500_fff">
+									View
+								</span>
+							</a>
+						</div>
+
+					<div><!--end .section-body -->
+				</section>
+			</div>
+		</div>
+		<script type="text/javascript" src="inventoryDashboard.js"></script>
+        <script type="text/javascript" src="../../helpers.js"></script>
+	</body>
+</html>
+

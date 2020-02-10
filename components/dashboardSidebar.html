@@ -1,0 +1,96 @@
+
+<!-- BEGIN MENUBAR-->
+<div id="menubar" class="menubar-inverse  customMenubar">
+        <!-- <div class="menubar-fixed-panel">
+            <div>
+                <a class="btn btn-icon-toggle btn-default menubar-toggle" data-toggle="menubar" href="javascript:void(0);" style="background-color:transparent">
+                    <span class="fa fa-bars customSidebarIcon" style="color:#ffffff" onclick="checkSidebar()"></span>
+                </a>
+            </div>
+            <div class="expanded">
+                <a href="dashboard.html">
+                    <span class="text-lg text-normal text-primary textqb" >Sub Stockist</span>
+                </a>
+            </div>
+        </div> -->
+    
+        <div class="menubar-scroll-panel">
+            <!-- BEGIN MAIN MENU -->
+            <div class="flex-row" style="padding: 25px 20px; background: #ffffff">
+                <img src="../assets/img/ss_store.png" style="padding-right: 20px;width: 40px;" />
+                <div class="flex-column" >
+                    <span id="ssName" class="text_16_500_212b36"></span>
+                    <span id="ssCode" class="text_16_500_212b36"></span>
+                </div>
+            </div>
+            <ul id="main-menu" class="gui-controls">
+    
+                <!-- BEGIN INVENTORY -->  
+                <li class="gui-folder" id="gui-expanded-inventory">
+                    <a onclick="gotoDashboard()">
+                        <img  class  = "sidebarIcon" src="../assets/img/homepage_icon.png"/>
+                        <span class=" themeColor noRadius">Home</span>
+                        <!-- <span class="title">Homepage</span> -->
+                    </a>
+                </li>
+                <li class="gui-folder" id="gui-expanded-inventory">
+                    <a onclick="gotoBilling()">
+                        <img  class  = "sidebarIcon" src="../assets/img/outletbilling_icon.png"/>
+                        <span class=" themeColor noRadius">Outlet Billing and Returns</span>
+                        <!-- <span class="title">Outlet Billing and Returns</span> -->
+                    </a>
+                </li>  
+    
+                <li class="gui-folder" id="gui-expanded-inventory">
+                    <a onclick="gotoInventory()">
+                        <img  class  = "sidebarIcon" src="../assets/img/placeorder_icon.png"/>
+                        <span class=" themeColor noRadius">Place Order/Return to RS</span>
+                        <!-- <span class="title">Place Order/Return to RS</span> -->
+                    </a>
+                </li>
+                <li class="gui-folder" id="gui-expanded-inventory">
+                    <a onclick="gotoProductDetails()">
+                        <img  class  = "sidebarIcon" src="../assets/img/productdetails_icon.png"/>
+                        <span class=" themeColor noRadius">Product Details</span>
+                        <!-- <span class="title">Product Details</span> -->
+                    </a>
+                </li>
+                <li class="gui-folder" id="gui-expanded-inventory">
+                    <a onclick="gotoManageStock()">
+                        <img  class  = "sidebarIcon" src="../assets/img/managestock_icon.png"/>
+                        <span class=" themeColor noRadius">Manage Stock</span>
+                        <!-- <span class="title">Manage Stock</span> -->
+                    </a>
+                </li>
+                <li class="gui-folder" id="gui-expanded-inventory">
+                    <a  onclick="gotoReports()">
+                        <img  class  = "sidebarIcon" src="../assets/img/reports_icon2.png"/>
+                        <span class=" themeColor noRadius">Reports</span>
+                        <!-- <span class="title">Reports</span> -->
+                    </a>
+                </li>
+                <li class="gui-folder" id="gui-expanded-inventory">
+                    <a onclick="gotoUnipay()">
+                        <img  class  = "sidebarIcon" src="../assets/img/unipay_points_icon.png"/>
+                        <span class=" themeColor noRadius">Ushop Points</span>
+                        <!-- <span class="title">Unipay Points</span> -->
+                    </a>
+                </li>
+                <li class="gui-folder" id="gui-expanded-inventory">
+                    <a onclick="gotoSettings()">
+                        <img  class  = "sidebarIcon" src="../assets/img/settings_icon.png"/>
+                        <span class=" themeColor noRadius">Settings</span>
+                        <!-- <span class="title">Unipay Points</span> -->
+                    </a>
+                </li>
+    
+                <!-- END INVENTORY -->
+    
+    
+            </ul><!--end .main-menu -->
+            <!-- END MAIN MENU -->
+    
+        </div><!--end .menubar-scroll-panel-->
+    </div><!--end #menubar-->
+    <!-- END MENUBAR -->    
+        

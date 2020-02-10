@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <script type="text/javascript" src="./loadCSS.js"></script>
+    <script>
+        window.$ = window.jQuery = require('./node_modules/jquery/dist/jquery.min.js');
+    </script>
+    <style>
+    .content{
+    align-items: unset
+    }
+    @media(max-width: 768px){
+        .content{
+            flex-direction: column
+        }
+        .content>div{
+            width: 100%
+        } 
+    }
+    .viewPass,.viewPassConfm{
+        position: absolute;
+        top: 42%; 
+        right: 5%;
+    }
+    input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+    /* .viewPassConfm{
+        position: absolute;
+        top: 0; 
+        right: 5%;
+    } */
+    </style>
+  </head>  
+<body class="body_light"> 
+    <!-- <div w3-include-html="components/header.html"></div>    -->
+    <div class="customLoader" id="customLoader" style="display:none">
+        <img src="assets/img/ss4_gif.gif">
+    </div>
+    <div class="flex-row content">
+      <div class="width-50">
+        <img src="./assets/img/group_image2.png" style="height:100vh;width:100%"/>
+      </div>
+  
+      <div class="width-50">
+  
+        <div class = "SSform" id = "checkLoginCredentials">
+          <form method = "post" id = "login" autocomplete="off" class="form">
+  
+            <div style="margin-bottom:30px">
+              <span id="signupTitle" class="text_20_500_212b36">Sign Up</span>
+              <!-- <span class="text_20_500_212b36">Sign Up</span> -->
+            </div>
+  
+            <div id="mobile_div" style="display: flex;flex-direction: column;">
+              <span class="text_16_500_212b36">Mobile Number</span>
+              <input type="number" name = "user" id = "user" value="" class="inputStyleSS" placeholder="Enter Mobile Number" required="required">
+            </div>
+
+            <div style="height: 30px; margin-bottom:20px">
+                <span id="verified_span" class="text_16_500_de4a49"></span>
+            </div>
+
+            <div id="password_div" style="margin-top:10px;display:none; flex-direction: column;">
+                <span class="text_16_500_212b36">Password</span>
+                <span style="position: relative">
+                    <input type="password" name  = "password" id = "password"  value="" class="width-100 inputStyleSS" placeholder="Enter Password" required="required">
+                    <img class="viewPass" src="assets/img/visibility_on.png" onclick="showPass('password','viewPass')"/>                
+                </span>
+            </div>
+            <div style="height:30px;width: 100%" class="margin-10">
+                <span style="color:#ba1800" id="validMob"></span>
+            </div>
+            <div id="confirm_password_div" style="margin-top:10px;display:none; flex-direction: column;">
+                <span class="text_16_500_212b36">Confirm Password</span>
+                <span style="position: relative">
+                    <input type="password" name  = "password" id = "confirmPassword"  value="" class="width-100 inputStyleSS" placeholder="Confirm Password" required="required">
+                    <img class="viewPassConfm" src="assets/img/visibility_on.png" onclick="showPass('confirmPassword','viewPassConfm')"/>               
+                </span>
+            </div>
+
+            <div id="verifyOTPField" style="margin-top:10px; display:none; flex-direction: column;">
+                <span class="text_16_500_212b36">Enter OTP</span>
+                <input type="number" id = "otpNumber" class="inputStyleSS" required="required">             
+            </div>
+            <div style="height: 30px;">
+                <span id="verified_otp_span" class="text_16_500_de4a49"></span>
+            </div>
+
+            <button id="sendOTPButton" type="button" class="btnBlue" style="padding: 15px 30px" onclick="sendOTP()">
+              <div class="text_18_500_fff">Send OTP</div>
+            </button>
+
+            <div id="doSignIn"  class="text_20_500_212b36"  style="margin-top:30px;">
+                <span style="font-weight: normal">Already have an account? </span><a href='index.html' style="font-weight: bold"> Sign in</a>
+            </div>
+
+            <div id="doSignUp" class="text_20_500_212b36"  style="margin-top:30px;display: none">
+                <span style="font-weight: normal">New Here? </span><a href='signup.html' style="font-weight: bold"> Sign Up</a>
+            </div>
+        
+            <button id="loginButton" type="button" class="btnBlue" style="display: none;padding: 15px 30px; margin-top:30px;" onclick="loginCheck()">
+                <div class="text_18_500_fff">Login</div>
+            </button>
+
+            <button id="verifyOTPButton" type="button" class="btnBlue" style="display: none;padding: 15px 30px;margin-top:30px;" onclick="verifyOTP()">
+                <div class="text_18_500_fff">Verify OTP</div>
+            </button>
+
+            <div style="margin-top: 10px">
+                <span id="passwordError" class="text_16_500_de4a49"></span>
+            </div>
+
+            <button id="setPasswordButton" type="button" class="btnBlue" style="display: none;padding: 15px 30px;margin-top:30px;" onclick="setPassword()">
+                <div class="text_18_500_fff">Next</div>
+            </button>            
+            
+          </form>
+
+        </div>
+
+         <div id="downloadNotificationModal" class="modal fade" role="dialog" data-keyboard="false" data-backdrop="static">
+                    <div class="modal-dialog customModalSize1" style="margin-top: 10%; width: 400px;">
+                        <div class="modal-content" style="width: 400px; border-radius: 4px;">
+                            <div class="flex-column" style="padding:20px;align-items: center;">
+                                <div id="messages"></div>
+
+                            <p id="version"></p>
+
+                            <div id="notificationUpdate" class="hidden">
+                          <p id="message"></p>
+                          <button id="restart-button" onClick="restartApp()" class="hidden">
+                            Restart
+                          </button>
+                        </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+  
+      </div>
+    </div>
+
+  </body> 
+  <script type="text/javascript">
+    window.$ = window.jQuery = require('./node_modules/jquery/dist/jquery.min.js');
+    var mac = require('getmac');
+    const api = require('./helpers/apiCall.js');
+    const si = require('systeminformation');
+    var number;
+    var loginResponse;
+    var storedPhoneNumber = localStorage.getItem('phoneNumber');
+    var dataSyncedStatus = localStorage.getItem('dataSynced');
+    var loggedInStatus = localStorage.getItem('loggedIn');
+
+    $(async()=>{
+        if(loggedInStatus =="true" && dataSyncedStatus=="true" ){
+            window.location.href = 'components/dashboard.html'; 
+        }
+        await backNavigation()
+    })
+
+    backNavigation=()=>{
+        $('#imgBack').css('display','none')
+        $('#imgForward').css('display','none')
+        $('#imgMenu').css('display','none')
+        $('#imgBell').css('display','none')
+    }
+
+    showPass=(id,className)=>{
+      passType = $('#'+id).attr('type')
+      console.log(passType)
+      if(passType== 'password'){
+        $('#'+id).attr('type','text')
+        $('.'+className).attr('src','assets/img/visibility_on_blue.png')
+      }
+      else{
+        $('#'+id).attr('type','password')
+        $('.'+className).attr('src','assets/img/visibility_on.png')
+      }
+    }
+
+    async function sendOTP(){
+        $( "#verified_span" ).text(" ");
+        $( "#validMob" ).text(" ");
+        $('#passwordError').text(" ");
+
+        number = $('#user').val();
+        console.log(number)
+        if(number.length > 0){
+            if(number.length !== 10){
+                $( "#verified_span" ).text( "Enter Valid Mobile Number!" ).show();
+                return false;
+            }
+        }
+        else{
+            $( "#verified_span" ).text( "Please fill mobile number field" ).show();
+            return false;
+        }
+
+        let data = {
+            mobile:number,
+            phoneCode:91
+        }
+        loader(1)
+        try{
+            generateOTP = await api.postWithoutHeaders('/v1/merchant/generateLoginOTP',data)
+            console.log(generateOTP,'generateOTP')
+            loader(0)
+            let message = generateOTP.data.message;
+            $('#verified_span').text(message).show();
+        }
+        catch(error){
+            console.log(error.response.data)
+            loader(0)
+            $('#verified_span').text(error.response.data.message).show();
+        }
+
+        if(generateOTP.data.isPhoneVerified){
+
+            let message = generateOTP.data.message;
+            $('#signupTitle').text('Sign In')
+            $('#doSignUp').css('display','flex')
+            $('#doSignIn').css('display','none')
+            $('#verified_span').text(message);
+            $('#password_div').css('display','flex');
+            $('#sendOTPButton').css('display','none');
+            $('#loginButton').css('display','flex');
+        }
+        else if(generateOTP.data.isPhoneVerified == 0)
+        {
+            $('#sendOTPButton').css('display','none');
+            $('#verifyOTPButton').css('display','flex');
+            $('#verifyOTPField').css('display','flex');
+        }
+
+    }
+
+
+    function loginCheck(){
+    
+        var serialNumber;
+        var username = $('#user').val();
+        var password = $('#password').val();
+        $( "#verified_span" ).text(" ");
+        $( "#validMob" ).text(" ");
+        $('#passwordError').text(" ");
+      if(username.length > 0){
+
+        if(username.length !== 10){
+            $( "#verified_span" ).text( "Enter Valid Mobile Number!" ).show();
+            return false;
+        }
+        else if(password.length <6){
+            $( "#validMob" ).text( "Enter password having atleast 6 Digits " ).show();
+            return false;
+            }
+        }
+        else{
+            $( "#verified_span" ).text( "Please fill mobile number field" ).show();
+            return false;
+        }
+
+        mac.getMac(async function(err, macAddress){
+
+            if (err)  throw err;
+
+            serialNumber = macAddress;
+
+            let data = {
+                username,
+                password,
+                serialNumber
+            }
+
+            loader(1)
+            try{
+                var login = await api.postWithoutHeaders('/v1/merchant/loginApp',data) 
+                console.log('login response',login);
+                loader(0)
+            }
+            catch(error){
+                console.log(error.response.data)
+                loader(0)
+                $( "#validMob" ).text(error.response.data.message).show();
+            }
+
+
+            loginResponse = login.data;
+            var fingerprint = loginResponse.fingerprint;
+            localStorage.setItem('loginResponse',JSON.stringify(loginResponse))
+            localStorage.setItem('serialNumber',fingerprint)
+
+            let obj = { 
+            storeID:loginResponse.storeList[0].storeID,
+            userID:loginResponse.userID,
+            serialNumber:loginResponse.fingerprint
+            }
+            loader(1)
+            try{
+                var newClient = await api.postWithoutHeaders('/v1/oauth/newClient',obj)
+                console.log('new client response',newClient)
+                loader(0)
+            } 
+            catch(error){
+                console.log(error.response.data)
+                loader(0)
+                $( "#validMob" ).text(error.response.data.message).show();
+            } 
+            
+            
+            var systemInfo = await si.system()
+            
+            obj = {
+                grant_type:'client_credentials',
+                serialNumber:fingerprint,
+                client_id:newClient.data.clientID,
+                client_secret:newClient.data.clientSecret,
+                deviceSerialNumber:systemInfo.serial,
+                manufacturer:systemInfo.manufacturer,
+                modelNumber:systemInfo.model
+            }
+            loader(1)
+            try{
+                var token = await api.postWithoutHeaders('/oauth/token',obj)
+                loader(0)
+                console.log('token response',token)
+            }
+            catch(error){
+                console.log(error.response.data)
+                loader(0)
+                $( "#validMob" ).text(error.response.data.message).show();
+            }
+
+            localStorage.setItem('clientID',newClient.data.clientID);
+            localStorage.setItem('clientSecret',newClient.data.clientSecret)
+            localStorage.setItem('access_token',token.data.access_token)
+
+            var isPhoneVerified = loginResponse.isPhoneVerified
+            var isPasswordSet = loginResponse.isPasswordSet
+            var isLocationSet = loginResponse.isLocationSet
+            // window.location.href = 'components/getStarted.html';
+
+            console.log(storedPhoneNumber,number,dataSyncedStatus,isPhoneVerified,isPasswordSet)
+
+            if(storedPhoneNumber == number && dataSyncedStatus== 'true'){
+                if(isPhoneVerified && isPasswordSet){
+                    localStorage.setItem('phoneNumber',number)
+                    localStorage.setItem('dataSynced',true)
+                    localStorage.setItem('loggedIn',true)
+                    window.location.href = 'components/dashboard.html';
+                }      
+            }
+            else{
+                if(isPhoneVerified && isPasswordSet){
+                    localStorage.setItem('dataSynced',false)
+                    localStorage.setItem('phoneNumber',username)
+                    localStorage.setItem('loggedIn',true)
+                    if(isLocationSet){
+                        window.location.href = 'components/dataSync.html';
+                    }
+                    else{
+                        window.location.href = 'components/locationDetails.html';
+                    }
+                }
+                // else if(isPhoneVerified && !isPasswordSet){
+                // $('#checkLoginCredentials').css('display','none')
+                // $('#setPasswordForm').css('display','flex')
+                // }
+                else{
+                    localStorage.setItem('dataSynced',false)
+                    localStorage.setItem('loggedIn',true)
+                    localStorage.setItem('phoneNumber',number)
+                    window.location.href = 'components/getStarted.html';
+                }
+            }
+        })
+    }
+
+    function verifyOTP(){
+        $( "#verified_span" ).text(" ");
+        $( "#verified_otp_span" ).text(" ");
+        
+        $( "#validMob" ).text(" ");
+        $('#passwordError').text(" ");
+        number = $('#user').val();
+        let otp = $('#otpNumber').val();
+        console.log(otp)
+
+        if(otp.length !== 4){
+            var errMsg = 'Invalid OTP'
+            $( "#verified_otp_span" ).text(errMsg).show();
+            return false;
+        }
+
+        mac.getMac(async function(err, macAddress){
+
+            if (err)  throw err;
+
+            let serialNumber = macAddress;
+
+            let data = {
+                mobile:number,
+                otp,
+                serialNumber
+            }
+
+            console.log(data)
+            loader(1)
+            try{
+                var verifyOTPResponse = await api.postWithoutHeaders('/v1/merchant/verifyLoginOTP',data)
+                loader(0)
+                console.log(verifyOTPResponse)
+                if(verifyOTPResponse.response){
+                    throw verifyOTPResponse;
+                }
+            }
+            catch(error){
+                console.log(error.response.data)
+                var errMsg = 'Invalid OTP'
+                loader(0)
+                $( "#verified_otp_span" ).text(errMsg).show();
+                return false;
+            }
+            loginResponse = verifyOTPResponse.data;
+            var fingerprint = loginResponse.fingerprint;
+ 
+            localStorage.setItem('loginResponse',JSON.stringify(loginResponse))
+            localStorage.setItem('serialNumber',fingerprint)
+            localStorage.setItem('dataSynced',false)
+            localStorage.setItem('phoneNumber',number)
+
+            let obj = { 
+                storeID:loginResponse.storeList[0].storeID,
+                userID:loginResponse.userID,
+                serialNumber:fingerprint
+            }
+            loader(1)
+            try{
+                var newClient = await api.postWithoutHeaders('/v1/oauth/newClient',obj)
+                loader(0)
+                console.log('new client response',newClient)
+            } 
+            catch(error){
+                console.log(error.response.data)
+                loader(0)
+            } 
+        
+            var systemInfo = await si.system()
+
+            obj = {
+                grant_type:'client_credentials',
+                serialNumber:fingerprint,
+                client_id:newClient.data.clientID,
+                client_secret:newClient.data.clientSecret,
+                deviceSerialNumber:systemInfo.serial,
+                manufacturer:systemInfo.manufacturer,
+                modelNumber:systemInfo.model
+            }
+            loader(1)
+            try{
+                var token = await api.postWithoutHeaders('/oauth/token',obj)
+                loader(0)
+                console.log('token response',token)
+            }
+            catch(error){
+                console.log(error.response.data)
+                loader(0)
+            }
+
+            localStorage.setItem('clientID',newClient.data.clientID);
+            localStorage.setItem('clientSecret',newClient.data.clientSecret)
+            localStorage.setItem('access_token',token.data.access_token)
+
+            if(verifyOTPResponse.data.status){
+
+                $('#mobile_div').css('display','none')
+                $('#verifyOTPField').css('display','none')
+                $('#verifyOTPButton').css('display','none');
+                $('#password_div').css('display','flex');
+                $('#confirm_password_div').css('display','flex');
+                $('#setPasswordButton').css('display','flex')
+            }
+            
+        })
+    }
+
+    async function setPassword(){
+        $( "#verified_span" ).text(" ");
+        $( "#validMob" ).text(" ");
+        $('#passwordError').text(" ");
+        let password = $('#password').val();
+        let confirmPassword = $('#confirmPassword').val();
+
+        if(password.length < 6){
+
+            let error = 'Password length should be minimum 6 characters'
+            $('#passwordError').text(error).show();
+            return false;
+        }
+
+        if(password !== confirmPassword){
+
+            let error = 'Passwords do not match';
+            $('#passwordError').text(error).show();
+            return false;
+        }
+
+        let data = {
+            password,
+            confirmPassword,
+            userID:loginResponse.userID,
+            mobile:number
+        }
+
+        console.log(data)
+        loader(1)
+        try{
+            var setPasswordResponse = await api.postWithoutHeaders('/v1/merchant/setFirstPassword',data)
+            loader(0)
+            console.log(setPasswordResponse.data)
+            if(setPasswordResponse.response){
+                throw setPasswordResponse;
+            }
+        }
+        catch(error){
+            console.log(error.response.data)
+            loader(0)
+            $('#passwordError').text(error.response.data.message).show();
+        }
+
+        if(setPasswordResponse.data.status){
+            window.location.href = 'components/getStarted.html';
+        }
+
+    }
+
+
+        
+        
+   
+  </script>
+  <script src="bundle.js"></script>
+  <script type="text/javascript" src="helpers.js"></script>
+
+  <script type="text/javascript">
+    
+const { ipcRenderer } = require('electron');
+
+    ipcRenderer.on('message', function(event, text) {
+  var container = document.getElementById('messages');
+  var message = document.createElement('div');
+  message.innerHTML = text;
+  document.getElementById("messages").innerHTML="";
+  container.append(message);
+});
+    const version = document.getElementById('version');
+   
+    ipcRenderer.send('app_version');
+    ipcRenderer.on('app_version', (event, arg) => {
+      console.log("on app_version function calling");
+      ipcRenderer.removeAllListeners('app_version');
+      //version.innerText = 'Version ' + arg.version;
+
+      // In page 1.
+       global.sharedObj = {versionGlobal: arg.version};
+
+       localStorage.setItem("appVersion",arg.version);
+
+    });
+
+const notification = document.getElementById('notificationUpdate'); 
+
+const message = document.getElementById('message');
+
+const restartButton = document.getElementById('restart-button');
+
+ipcRenderer.on('update_available', () => { 
+  console.log("update_available is working");
+  ipcRenderer.removeAllListeners('update_available');
+  message.innerText = 'A new update is available. Downloading now...';
+  notification.classList.remove('hidden');
+ // $("#downloadNotificationModal").modal('hide');
+  $("#downloadNotificationModal").modal('show');
+});
+
+ipcRenderer.on('update_downloaded', () => {
+  ipcRenderer.removeAllListeners('update_downloaded');
+  message.innerText = 'Update Downloaded. It will be installed on restart. Restart now?';
+  restartButton.classList.remove('hidden');
+  notification.classList.remove('hidden');
+  //$("#downloadNotificationModal").modal('hide');
+  $("#downloadNotificationModal").modal('show');
+});
+
+function closeNotification() {
+  notification.classList.add('hidden');
+}
+function restartApp() {
+  ipcRenderer.send('restart_app');
+}
+
+  </script>
+
+</html>
+
+
+
+
+

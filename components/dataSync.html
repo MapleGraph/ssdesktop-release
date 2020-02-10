@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script type="text/javascript" src="../loadCSS.js"></script>
+    
+    <script>
+        window.$ = window.jQuery = require('../node_modules/jquery/dist/jquery.min.js');
+        const {dialog} = require('electron').remote
+    </script>
+    <style>
+
+        .syncLoader > img{
+            width:80%;
+        } 
+        #myProgress {
+            height: 20px;
+            border-radius: 10px;
+            background-color: #dbe8f8;
+        }
+        #myBar {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            height: 20px;
+            line-height: 30px;
+            color: white;
+            border-radius: 9px;
+            background-color: #dca849;
+            padding-right: 10px;
+            font-size: 13px;
+        }
+    </style>
+  </head>  
+  <body  class="body_light" onload="main()">       
+    <div class='headerDiv' w3-include-html="header.html"></div>
+    <div id="content">
+        <div class="flex-row" id="syncFailed" style="height:120px;justify-content: space-between; margin-bottom: 20px;">
+            <div class="big_header">
+            </div>
+            <a href="../index.html"  id="syncFailedBtn"  style="display: none">
+                <button class="btnBlue" style="padding: 10px 65px">
+                    Login
+                </button>
+            </a>
+        </div>
+        <div class="flex-row margin-40" style="justify-content: center">
+            <section>
+                <div class="section-body">
+                    <div class="syncLoader text-center" id="customLoader">
+                        <img class="margin-20" src="../assets/img/syncing_gif.gif">
+                    </div>
+                    <div class="flex-row text_16_500_565656" style="justify-content:center;">
+                        <span class="margin-10" style="height :40px">
+                            Syncing...
+                            <span id="tableSync" style="padding-left: 10px"></span>
+                        </span>
+                    </div>
+                    <div class="flex-row text_16_500_565656">
+                        <div id="myProgress" class="margin-10 width-100">
+                            <div id="myBar" style="width:0%">0%</div>
+                        </div>
+                    </div>
+                    <div class="flex-start margin-20 text-center">
+                        <span class="text_24_500_212b36">
+                            Please wait while we setup your store..
+                        </span>
+                    </div>
+                </div>
+            </section>              
+        </div>
+    </div>
+    <script type="text/javascript" src="../assets/js/moment.min.js"></script>
+    <script type="text/javascript" src="newRunQuery.js"></script>
+      
+    <script>
+        $(async()=>{
+            await getMenu('')
+            await backNavigation()
+        })
+
+        backNavigation=()=>{
+            $('#imgBack').css('opacity',0.5)
+            $('#imgForward').css('opacity',0.5)
+            $('#imgMenu').css('display','none')
+            $('#imgBell').css('display','none')
+        }
+    </script>
+    <!-- <script type="text/javascript" src="../jobs/kernelJS.js"></script> -->
+     <!-- <script type="text/javascript" src="../loadJS1.js"></script> -->
+
+    <script type="text/javascript" src="../helpers.js"></script>
+
+  </body> 
+
+</html>
+
+
+
+
+

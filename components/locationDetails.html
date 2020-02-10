@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <script type="text/javascript" src="../loadCSS.js"></script>
+      <script type="text/javascript" src="../helpers/apiCall.js"></script>
+      <script>
+        window.$ = window.jQuery = require('../node_modules/jquery/dist/jquery.min.js');
+        const {dialog} = require('electron').remote
+      </script>
+      <style>
+        #map {
+          height: -webkit-fill-available;
+        }
+        .parent-div{
+          display: flex;
+          flex-direction: column;
+          flex:1;
+          height: 55vh;
+
+        }
+
+        .top-div{
+          border-radius: 4px 4px 0px 0px;
+          background-color: #f7f7f7;
+          padding:0 20px;
+          height: 60px;
+        }
+
+        .bottom-div{
+          border-radius: 0px 0px 4px 4px;
+          background-color: #fff;
+          padding:20px;
+          height: calc(100% - 60px);
+        }
+
+        .uploader {
+            background:#f3f3f3; 
+            border:2px dashed #e8e8e8;
+            text-align: center;
+            padding: 20px 10%;
+            position:relative;
+            height:100%;
+            width: 100%;
+        }
+
+        .uploader>div{
+          padding: 20px;
+          font-size: 16px;
+          height: 30%;
+        }
+
+        #filePhoto{
+            position:absolute;
+            left:0;
+            z-index:2;
+            opacity:0;
+            cursor:pointer;
+            width: 100%;
+            height: 100%;
+            top: 0;
+        }
+
+        .uploader img{
+          width: 100%;
+          height: 70%;
+          z-index:1;
+          border:none;
+        }
+      </style>
+  </head>  
+  <body class="body-light"> 
+    <div class='headerDiv' w3-include-html="initialHeader.html"></div>   
+    <div class="customLoader" id="customLoader" style="display:none">
+          <img src="../assets/img/ss4_gif.gif">
+    </div>
+    <div id="content">
+      <div class="flex-row margin-40" style="justify-content: space-between; margin-bottom: 20px">
+        <div class="big_header">
+          Location Details
+        </div>
+        <button class="btnBlue" style="padding: 10px 65px" onclick="saveLocation()">
+          Confirm
+        </button>
+      </div>
+      <div class="flex-row" >
+        <h2 class="margin-20 text_24_500_212b36">
+            Confirm your location details
+        </h2>
+      </div>
+      <div class="flex-row margin-20" style="align-items: unset; margin-bottom: 0">
+          <div class="parent-div" style="	box-shadow: 0 2px 8px 0 rgba(174, 174, 174, 0.51);">
+              <div class="top-div flex-row">
+                  <span class="text_16_500_212b36">Upload your Store Image</span>
+              </div>
+              <div class="bottom-div flex-row">
+                  <div class="uploader flex-column">
+                      <div  class="flex-row">
+                        click here or drag here your images for preview and set
+                      </div>
+                      <img src=""  style="display: none"/>
+                      <input type="file" name="userprofile_picture"  id="filePhoto" />
+                  </div>
+              </div>
+          </div>
+          <div class="parent-div" style="margin-left:20px;box-shadow: 0 2px 8px 0 rgba(174, 174, 174, 0.51);">
+              <div class="top-div flex-row">
+                  <span class="text_16_500_212b36">Your Store Location</span>
+              </div>
+              <div class="bottom-div">
+                <div id="map"></div>
+              </div>
+          </div>
+      </div>
+      <div class="flex-row margin-10" style="justify-content: flex-end">
+        <div class="width-50 flex-row" style="justify-content: space-around">
+          <span class="text_18_500_212b36 ">
+            Store Cordinates
+          </span>
+          <span class="flex-column width-50 text_14_500_565656">
+            <div class="flex-row" style="justify-content: space-around;">
+              <span>
+                Latitude: 
+              </span>
+              <span id="latitudeValue">
+              </span>
+            </div>
+            <div class="flex-row"  style="justify-content: space-around;">
+                <span>
+                  Longitude : 
+                </span>
+                <span id="longitudeValue">  
+                </span>
+            </div>
+          </span> 
+        </div>
+        </div>
+    </div>
+
+    <script>
+      $(async()=>{
+        await getMenu('Location Details')
+        await backNavigation()
+      })
+      
+      backNavigation=()=>{
+        $('#imgBack').css({'opacity':1 , 'cursor' : 'pointer'}).click(()=>{
+          window.location.href="storeDetails.html"
+        })
+        $('#imgForward').css('opacity',0.5)
+        $('#imgMenu').css('display','none')
+        $('#imgBell').css('display','none')
+      }
+      
+      var axios = require('axios');
+      var userInfo = JSON.parse(localStorage.getItem('loginResponse'));
+      console.log(userInfo)
+
+      var map, infoWindow,storeImageLocation,imageType;
+      var pos = {lat: 28.6154084, lng:77.3670417 };
+
+      function initMap() {
+
+        console.log('initMap')
+
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: pos,
+          zoom: 6
+        });
+        infoWindow = new google.maps.InfoWindow;
+        
+        navigator.geolocation.getCurrentPosition(function(position) {
+           pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          console.log('position',pos)
+          $('#latitudeValue').text(pos.lat.toFixed(2))
+          $('#longitudeValue').text(pos.lng.toFixed(2))
+        
+          checkLat = parseInt(pos.lat)
+          checkLng = parseInt(pos.lng)
+
+          console.log(checkLng,checkLat)
+
+          if(checkLat==0 || checkLng==0 ){
+            var message ='Invalid Store Cordinates!'
+            isError(message)
+          }
+
+          infoWindow.setPosition(pos);
+          infoWindow.setContent('Location found.');
+          infoWindow.open(map);
+          map.setCenter(pos);
+        }, 
+        (error)=>{
+          console.log(error)
+        },
+        { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+        );
+      } 
+
+
+    $("#filePhoto").change(function(event){
+    var input = $(event.currentTarget);
+    var file = input[0].files[0];
+        var reader = new FileReader();
+        if (file.type.match('image.*')) {
+          reader.readAsDataURL(file);
+          reader.onload = function () {
+              $('.uploader img').css('display','flex').attr('src',reader.result);
+              storeImageLocation=reader.result;
+              imageType=  file.type.split("/")[1]
+          }
+        }
+        else{
+
+          const dialogOptions = {type: 'info', buttons: ['OK'], message: 'Please select an image'}
+          dialog.showMessageBox(dialogOptions, async i => {
+            if(!i){
+              $('.uploader img').css('display','none').attr('src','');
+                imageType=null;
+                storeImageLocation=null;
+              }
+          })
+        }
+    })
+  
+
+    async function saveLocation(){
+        let data = {
+          storeID:userInfo.storeList[0].storeID, 
+          userID:userInfo.userID, 
+          longitude:pos.lat, 
+          latitude:pos.lng, 
+          storeImageLocation:storeImageLocation, 
+          imageType:imageType
+        }
+
+        console.log(data)
+
+        if(data.imageType){
+          loader(1)
+          try{
+            let response = await postWithoutStore('captureStoreLocation',data)
+            console.log(response,'response')
+
+            if(response.response){
+              throw response;
+            }
+
+            if(response.data.status){
+              loader(0)
+
+              localStorage.setItem('isPhoneVerified',1);
+              localStorage.setItem('isPasswordSet',1);
+              localStorage.setItem('isLocationSet',1); 
+
+              window.location.href = 'dataSync.html';
+            }
+
+          }
+          catch(error){
+            console.log(error.response)
+          }
+        }
+        
+        
+        else{
+          // $( "#validImage" ).text( "Select an image!" ).show().fadeOut( 3000 );
+          const dialogOptions = {type: 'info', buttons: ['OK'], message: 'Please select an image'}
+          dialog.showMessageBox(dialogOptions, async i => {
+            if(!i){
+                $('.uploader img').attr('src','');
+                imageType=null;
+                storeImageLocation=null;
+              }
+          })
+          return false;
+        }
+      }
+    
+    </script>
+                                                    
+    <script async defer
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBKH0bC1uSJZJW3WHXa3QRB5_GHcqfG5x4&callback=initMap">
+    </script> 
+
+    <script type="text/javascript" src="../loadJS.js"></script>
+    <script type="text/javascript" src="../helpers.js"></script>
+
+  </body> 
+
+</html>
+
+
+
+
+

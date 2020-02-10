@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+        <script type="text/javascript" src="../../loadCSS.js"></script>
+        <script type="text/javascript" src="../../helpers/apiCall.js"></script>
+        <script type="text/javascript" src="../../loadJS.js"></script>
+        <script>
+            window.$ = window.jQuery = require('../../node_modules/jquery/dist/jquery.min.js');
+            const {dialog} = require('electron').remote
+            require('../../assets/js/libs/DataTables/jquery.dataTables.min.js')
+            require('../../assets/js/libs/bootstrap-table/dist/bootstrap-table.min.js')
+            require('../../assets/js/libs/bootstrap-table/dist/extensions/filter-control/bootstrap-table-filter-control.min.js')
+            require('../../assets/js/libs/bootstrap-table/src/extensions/editable/bootstrap-table-editable.js')
+        </script>
+        <script src="../../bundle.js"></script>
+        <style type='text/css'>
+
+			.padding-fix{
+				padding: 0 24px;
+            }
+            
+			.fixed-table-toolbar{
+				margin-bottom:2%;
+            }
+            
+			.PODetailsHeaderButton{
+			}
+			.accept-po{
+				background-color: #1766a6;
+				color: #ffffff;
+			}
+
+			.download-po{
+				border: solid 1px #1766a6;
+				color: #1766a6;
+			}
+			.PODetails-order-details, .PODetails-vendor-details{
+				border-radius: 4px;
+  				background-color: #ffffff;
+			}
+			.orderDetailsHeader, .vendorDetailsHeader{
+				height: 58px;
+				border-radius: 4px;
+  				background-color: #f7f7f7;
+				padding:20px;
+			}
+			.vendorDetailsContent div,.orderDetailsContent div {
+				margin:10px 20px;
+		
+            }
+
+			.tableFooter{
+				justify-content: space-between;
+				margin:20px;
+                align-items:center;
+			}
+			.poPrice{
+				display:flex;
+				flex-direction:column;
+				width:30%;
+			}
+			.poPrice div{
+				padding-top:10px;
+				display:flex;
+				text-align:right;
+			}
+
+			.select2-container{
+				border-radius: 4px;
+				padding-right: 0px;
+    			padding-top: 0px;
+			}
+			.select2-container .select2-choice{
+				border: 0px;
+			}
+			.select2-container .select2-choice .select2-arrow{
+			    display: inline-block;
+			    width: 34px;
+			    height: 100%;
+			    position: absolute;
+			    right: 0;
+			    top: 0;
+			    border-radius: 0px;
+			    background-clip: padding-box;
+			    background: #e8e8e8;
+			    border-left: 1px solid #cecece;
+			}
+
+			.select2-container .select2-choice .select2-arrow b:before{
+				margin-top: -1px !important;
+			}
+
+            .descRow{
+                display:flex;
+                justify-content: space-around;
+            }
+            .returnTitle{
+                font-size: 20px;
+                font-weight: 500;
+                line-height: 1.2;
+                letter-spacing: -0.5px;
+                text-align: center;
+                color: #212b36;
+                margin: 12px 0 18px;
+
+            }
+            .returnMsg{
+                font-size: 14px;
+                font-weight: 500;
+                line-height: 1.29;
+                letter-spacing: -0.23px;
+                text-align: center;
+                color: #6b7783;
+                margin: 20px 0;
+            }
+            .returnDesc{
+                display: flex;
+                flex-direction: column;
+                margin: 30px auto;
+                text-align: left;
+            }
+            .returnDesc span{
+                font-size: 14px;
+                line-height: 1.29;
+                letter-spacing: 0.16px;
+                color: #212b36;
+                width: 50%;
+                padding-left:10px;
+            }
+            .returnActionBtn{
+                width: 154px;
+                height: 48px;
+                border-radius: 4px;
+                border: solid 1px #1766a6;
+                margin-right:10px;
+                font-size: 16px;
+                font-weight: 500;
+                text-align: center;
+                color: #1766a6;
+            }
+            .closeBtn{
+                border: solid 1px #1766a6;
+                margin-right:10px;
+                color: #1766a6;
+            }
+            .downloadBtn{
+                background-color: #1766a6;
+                color: #ffffff;
+            }
+            .stockReceivedModal{
+                width: 440px;
+                border-radius: 8px;
+                margin: auto;
+                background-color: #ffffff;
+            }
+
+            .tableHeader1{
+                align-items:center;
+                justify-content: space-between;
+                margin-bottom :28px;
+            }
+
+            .select2{
+                width: 410px;
+                height: 36px;
+                border-radius: 4px;
+                border: solid 1px #c4cdd5;
+                background-image: linear-gradient(to bottom, #ffffff, #f9fafb);
+            }
+
+			.fixed-table-body{
+				min-height:240px;
+            }
+            /* .customModalHeader{
+                padding: 0 10px !important;
+            } */
+            .customModal{
+                width: 50%;
+            }
+            .customModal .modal-content{
+			border-radius: 8px;
+		    }
+            .inactive{
+				pointer-events: none;
+				opacity: .5;
+            }
+            .modal-header {
+                padding: 10px;
+                border-bottom: none; 
+                min-height: 16.846153846px;
+            }
+            .childDiv{
+                color: #008000
+            }
+        </style>
+
+    </head>
+    <body class="menubar-hoverable header-fixed menubar-pin menubar-first">
+        <div  class='headerDiv' w3-include-html="../header.html"></div>
+        <!-- BEGIN BASE-->
+        <div id="base">
+            <div id="sidebar" w3-include-html="../sidebar.html"></div>
+            <!-- BEGIN OFFCANVAS LEFT -->
+            <div class="offcanvas"></div>
+            <!--end .offcanvas-->
+            <!-- END OFFCANVAS LEFT -->
+
+            <!-- BEGIN CONTENT-->
+            <div id="content">
+
+                <div id="myModal2" class="modal fade" role="dialog" data-keyboard="false" data-backdrop="static" >
+                    <div class="modal-dialog customModal" >
+                        <!-- Modal content-->
+                        <div class="modal-content stockReceivedModal">
+                           
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            </div>
+                           
+                            <div class="modal-body" id = "itemsList" style="padding:40px;text-align:center">
+                                <img src="../../assets/img/sucess-icon.svg" />
+                                <div class='returnTitle'>
+                                    Stock Recieved
+                                </div>
+                                <div class='returnMsg'>
+                                    An SMS has been sent to your register mobile number with summary of stock received. 
+                                </div>
+                                <div class='returnDesc' id="stockReceived">
+                                    <div class='descRow'>
+                                        <span style="color: #6b7783" >Order ID</span> : <span id='orderID' style='font-weight:500' ></span>
+                                    </div>
+                                    <div class='descRow'>
+                                        <span style="color: #6b7783">Items</span> : <span id='items'  style='font-weight:500' ></span>
+                                    </div>
+                                    <div class='descRow'>
+                                        <span style="color: #6b7783">Tax</span> : <span id='tax' style='font-weight:500' ></span>
+                                    </div>
+                                    <div class='descRow'>
+                                        <span style="color: #6b7783">Amount</span> : <span id='amount' style='font-weight:500' ></span>
+                                    </div>
+                                    <div class='descRow'>
+                                        <span style="color: #6b7783">Debit Adjustment</span> : <span id='debitAdjustment'  style='font-weight:500'></span>
+                                    </div>
+                                    <div class='descRow'>
+                                        <span style="color: #6b7783">credit Adjustment</span> : <span id='creditAdjustment' style='font-weight:500' ></span>
+                                    </div>
+                                    <div class='descRow'>
+                                        <span style="color: #6b7783">Ushop Adjustment</span> : <span id='unipayAdjustment'  style='font-weight:500' ></span>
+                                    </div>
+                                    <div class='descRow'>
+                                        <span style="color: #6b7783">Reverse Payout</span> : <span id='reversePayout' style='font-weight:500' ></span>
+                                    </div>
+                                    <div class='descRow'>
+                                        <span style="color: #6b7783">Outlet Payout</span> : <span id='outletPayout' style='font-weight:500' ></span>
+                                    </div>
+                                    <div class='descRow'>
+                                        <span style="color: #6b7783">Net Payble</span> : <span id='netPayble' style='font-weight:500' ></span>
+                                    </div>
+                                    <div class='descRow'>
+                                        <span style="color: #6b7783" >Refund Amount</span> : <span id='refundAmount'  style='font-weight:500'
+                                        ></span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <button class='closeBtn returnActionBtn' onclick="closeModal()">Close</button>
+                                    <!-- <button class='downloadBtn returnActionBtn' onclick="triggerDownloadPdf()">Download</button> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="myModal" class="modal fade" role="dialog" data-keyboard="false" data-backdrop="static">
+                    <div class="modal-dialog customModal" >
+                        <!-- Modal content-->
+                        <div class="modal-content">
+                            <div class="modal-header customModalHeader flex-row">
+
+                            <div class="text_20_500_212b36">
+                                Select reason for return for below items
+                            </div>
+                            <span type="button" class=" closeModalButton" data-dismiss="modal"><img src = "../../assets/img/close.png" class = "closeModalImage closeModalImage1"></span>
+                            <h4 class="modal-title" id = "roleTitle1"></h4>
+
+                            </div>
+                            <div class="modal-body" id = "itemsList">
+                                <div class='flex-row tableHeader1' id='tableHeader1' style='display:none;'>
+                                    <div class='flex-row'>
+                                        <span class='text_16_500_565656'>Total Return Items :</span>
+                                        <span id='totalItems1' class='text_16_500_212b36' style='padding-left:10px'></span>
+                                    </div>
+                                    <div class='flex-row'>
+                                        <div  style='justify-content: space-around'>
+                                            <span class='text_16_500_565656'>Total Return Value :</span>
+                                            <span id='totalPrice1' class="text_16_500_212b36"  style='padding-left:10px'></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <table class="table table-striped table-bordered dataTable no-footer table-hover" id="returnedItemsListTable">
+                                    <thead>
+                                        <tr>
+                                            <th data-field = "productName" data-sortable = "true">Name <i class="fa fa-fw fa-sort"></i></th>
+                                            <th data-field = "reasonList" >Select Reason</th>
+                                            <th data-field = "voidQuantity" data-sortable = "true">Quantity <i class="fa fa-fw fa-sort"></i></th>
+                                            <th data-field = "voidAmount" data-sortable = "true">Price <i class="fa fa-fw fa-sort"></i></th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                                <div class="flex-row" style="margin-bottom:15px;justify-content: flex-end">
+                                    <button class='btnWhite' onclick="closeReturn()">Close</button>
+                                    <button class='btnBlue' style="padding: 4px 12px; margin-left: 10px" onClick='confirmReturn()' type="button">Confirm Return</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BEGIN BLANK SECTION -->
+                <section>
+                    <div class='flex-row margin-40' style='justify-content: space-between;'>
+                        <div class='flex-column' style='justify-content: space-evenly;'>
+                            <a
+                                href="pendingDeliveries.html"
+                                class='flex-row margin-10' style='align-items:center'>
+                                <img src="../../assets/img/back_icon.png"  style='width:6px;height:12xpx;margin-right:8px'/>
+                                <span class='breadcrumbText'>Pending Delivery Confirmation</span>
+                            </a>
+                            <h3 class='text_24_500_212b36 margin-10' id="poHead">	
+                            </h3>
+                        </div>
+                        <div class=''>
+                            <button
+                                class="btn btn-md-secondary btnBlue"
+                                onClick = "acceptOrder()"
+                            >
+                                Accept Order
+                            </button>
+                        </div>
+                    </div>
+                    <div class='flex-row'>
+                        <div class="card"  style="width:100%;border-radius:4px" >
+                            <div class="card-body">
+                                <div
+                                    id="message"
+                                    class="alert alert-success alert-dismissible"
+                                    role="alert"
+                                    style="display: none;"></div>
+                                <table
+                                    class="table table-striped table-bordered dataTable no-footer"
+                                    id="datatable1">
+                                    <thead>
+                                        <tr>
+                                            <th data-field="SNo" class='text-left'>S.No.</th>
+                                            <th data-field="productName" data-formatter ="renderItemName" class='text-left'>Item Name</th>
+                                            <th data-field="serialNumber" class='text-left'>SKU</th>
+                                            <th data-field="pkd" class='text-left'>PKD</th>
+                                            <th data-field="productActualPrice" class='text-right'>TUR</th>
+                                            <th data-field="mrp" class='text-right'>MRP</th>
+                                            <!-- <th data-field="upc" class='text-right'>UPC</th> -->
+                                            <th data-field="quantityOrdered" data-formatter ="renderQuatityInput" class='text-right'>Quantity</th>
+                                            <th data-field="productValue"   data-formatter = "renderAmount" class='text-right' >Total</th>
+                                        </tr>
+
+                                    </thead>
+
+                                </table>
+                                <div class='tableFooter flex-row' id='tableFooter' style='display:none'>
+                                    <div class='flex-row'>
+                                        <span class='text_20_500_6b7783'>Total Items :</span>
+                                        <span id='totalItems' class='text_20_500_212b36' style='padding-left:10px'></span>
+                                    </div>
+                                    <div class='poPrice'>
+                                        <!-- <div style='justify-content: space-around'>
+                                            <span style='width:50%' class="text_14_500_6b7783">Subtotal :</span>
+                                            <span style='width:50%' class='text_14_500_212b36' id='subtotal'></span>
+                                        </div>
+                                        <div style='justify-content: space-around'>
+                                            <span style='width:50%' class="text_14_500_6b7783" > Tax :</span>
+                                            <span style='width:50%' class='text_14_500_212b36' id='totalTax'></span>
+                                        </div> -->
+                                        <div  style='justify-content: space-around'>
+                                            <span style='width:50%' class="text_20_500_6b7783" >Total :</span>
+                                            <span style='width:50%' class='text_20_500_212b36' id='totalPrice'></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- BEGIN BLANK SECTION -->
+            </div>
+        <!--end #content-->
+        <!-- END CONTENT -->
+        <!-- BEGIN OFFCANVAS RIGHT -->
+        <!-- END OFFCANVAS RIGHT -->
+        </div>
+        <!--end #base-->
+        <!-- END BASE -->
+        <script type="text/javascript" src="acceptPendingDeliveries.js"></script>
+        <script type="text/javascript" src="../../helpers.js"></script>
+    </body>
+</html>

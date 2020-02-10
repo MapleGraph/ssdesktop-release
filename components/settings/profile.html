@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+
+        <script type="text/javascript" src="../../loadCSS.js"></script>
+        <script>
+            const basepath = process.env.basepath
+            const sqlite3 = require('sqlite3').verbose();
+            const os = process.env.os
+            let dbPath = basepath
+            if (dbPath.indexOf('app.asar') > -1 || os === 'WINDOWS') {
+                dbPath = dbPath.replace('app.asar', '')
+            }
+            dbPath += '/ssDB';
+            console.log("DB path is = " + dbPath);
+            const db = new sqlite3.Database(dbPath);
+            window.$ = window.jQuery = require('../../node_modules/jquery/dist/jquery.min.js');
+            require('../../assets/js/libs/bootstrap-table/dist/bootstrap-table.min.js')
+            require('../../assets/js/libs/bootstrap-table/dist/extensions/filter-control/bootstrap-table-filter-control.min.js')
+            require('../../assets/js/libs/bootstrap-table/src/extensions/editable/bootstrap-table-editable.js')
+        </script>
+        <script src="../../bundle.js"></script>
+        <style type="text/css">
+        
+        div.bootstrap-table {
+			border-radius: 4px;
+            background:transparent;
+            padding-top:0px;
+		}
+
+		.fixed-table-toolbar .search{
+            background-color:transparent;
+		}
+
+		.fixed-table-container{
+			padding-top:0px;
+		}
+
+		.fixed-table-toolbar{
+            background-color:transparent;
+            margin-bottom:0px;
+        }
+
+        .fixed-table-loading{
+		    display: none;
+        }
+    
+        .fixed-table-toolbar{
+            display: none;
+        }
+        
+        .bootstrap-table .table thead > tr > th {
+                background: #f7f7f7;
+				border:none;
+				font-size: 14px;
+				font-weight: bold;
+				color: #171717;
+        }
+
+		.rowStyle{
+			background-color: #ffffff;
+			font-size: 14px;
+			font-weight: 500;
+			color: #565656;
+        }
+
+        .tableRowStyle{
+            background-color: #f7f7f7;
+			font-size: 14px;
+			font-weight: 500;
+            color: #565656;
+            padding:0px 20px;
+            border-bottom: solid 1px #979797;
+        }
+        
+        #content{
+            width: calc(85% - 40px);
+            position: relative;
+            right: 0;
+            margin: 0 auto ;
+        }
+
+        html, body{
+            height: 100%;
+        }
+
+        .viewCard{
+            width: 104px;
+            height: 32px;
+            border-radius: 24px;
+            background-color: #1766a6;
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 1.25;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .inventoryText{
+            font-weight: bold;
+        }
+
+		</style>
+
+    </head>
+    <body class="menubar-hoverable header-fixed menubar-pin menubar-first" onload="loadProfile()">
+
+        <div class='headerDiv' w3-include-html="../header.html"></div>
+
+        <div id="base" style="height:100%">
+            <div id="sidebar" w3-include-html="../sidebar.html"></div>
+
+            <div id="content">                
+
+                <div id="schemesModal" class="modal fade" role="dialog" data-keyboard="false" data-backdrop="static">
+                    <div class="modal-dialog customModalSize1" style="margin-top: 10%;">
+                        <div class="modal-content">
+                            
+                        </div>
+                    </div>
+                </div>
+                
+                <section id="settings">
+
+                    <div class="section-body"> 
+
+                        <div style="margin-top:50px;">
+                            <div onclick="goBack()" style="cursor: pointer;" class="flex-row">
+                                <span><img src="../../assets/img/back_icon.png"  style='width:8px;height:16px;'/></span>
+                                <span style="margin-left: 10px;" class="text_18_500_637381">Settings</span>
+                            </div>       
+                            
+                            <div style="margin-top:10px">
+                                <span class="text_24_500_212b36">Profile</span>
+                            </div>
+                        </div>                        
+                
+                        <div style="margin-top:30px; display: flex; flex-direction: row; ">
+                            <div class="col-md-5">
+
+                                <div class="flex-row">
+                                    <img src='../../assets/img/blueHome2x.png' style="width:20px;height:20px;"/>
+                                    <span style="padding-left:10px;" class="text_20_500_1766a6">Store Information</span>
+                                </div>
+
+                                <div class="flex-column" style="margin-top:30px;">
+                                    <span class="text_16_500_6b7783">Sub Stockist Store Name</span>
+                                    <div class="blue-input profile-div">
+                                         <span id="storeName"></span>
+                                    </div>
+                                </div>
+                                <div class="flex-column" style="margin-top:30px;">
+                                    <span class="text_16_500_6b7783">Registered Phone Number</span>
+                                    <div class="blue-input profile-div">
+                                        <span id="phoneNumber"></span>
+                                    </div>
+                                </div>
+                                <div class="flex-column" style="margin-top:30px;">
+                                    <span class="text_16_500_6b7783">HUL Code</span>
+                                    <div class="blue-input profile-div">
+                                        <span id="hulCode"></span>
+                                    </div>
+                                </div>
+                                <div class="flex-column" style="margin-top:30px;">
+                                    <span class="text_16_500_6b7783">Creation Date</span>
+                                    <div class="blue-input profile-div">
+                                        <span id="creationDate"></span>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-1"></div>
+
+                            <div class="col-md-5">
+
+                                <div class="flex-row">
+                                    <img src='../../assets/img/blueHome2x.png' style="width:20px;height:20px;"/>
+                                    <span style="padding-left: 10px;" class="text_20_500_1766a6">Store Address Information</span>
+                                </div>
+
+                                <div class="flex-column" style="margin-top:30px;">
+                                    <span class="text_16_500_6b7783">Address Line 1</span>
+                                    <div class="blue-input profile-div">
+                                        <span id="addressLineOne"></span>
+                                    </div>
+                                </div>
+                                <div class="flex-column" style="margin-top:30px;">
+                                    <span class="text_16_500_6b7783">Address Line 2</span>
+                                    <div class="blue-input profile-div">
+                                        <span id="addressLineTwo"></span>
+                                    </div>
+                                </div>
+                                <div class="flex-column" style="margin-top:30px;">
+                                    <span class="text_16_500_6b7783">Zip/Postal Code</span>
+                                    <div class="blue-input profile-div">
+                                        <span id="zipCode"></span>
+                                    </div>
+                                </div>
+                                <div class="flex-row" style="margin-top:30px;">
+                                    <div class="flex-column" style="flex:1">
+                                        <span class="text_16_500_6b7783">City</span>
+                                        <div class="blue-input profile-div">
+                                            <span id="city"></span>
+                                        </div>
+                                    </div>
+                                    <div class="flex-column" style="margin-left: 10px; flex:1;">
+                                        <span class="text_16_500_6b7783">State</span>
+                                        <div class="blue-input profile-div">
+                                            <span id="state"></span>
+                                        </div>
+                                    </div>
+                                    <div class="flex-column" style="margin-left: 10px; flex:1;">
+                                        <span class="text_16_500_6b7783">Country</span>
+                                        <div class="blue-input profile-div">
+                                            <span id="country"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div style="margin:40px 0px; display: flex; flex-direction: row;">
+                            <div class="col-md-5">
+
+                                <div class="flex-row">
+                                    <img src='../../assets/img/blueHome2x.png' style="width:20px;height:20px;"/>
+                                    <span style="padding-left:10px;" class="text_20_500_1766a6">Vendor Information</span>
+                                </div>
+
+                                <div class="flex-column" style="margin-top:30px;">
+                                    <span class="text_16_500_6b7783">Vendor Name</span>
+                                    <div class="blue-input profile-div">
+                                         <span id="vendorStoreName"></span>
+                                    </div>
+                                </div>
+                                <div class="flex-column" style="margin-top:30px;">
+                                    <span class="text_16_500_6b7783">Vendor GUID</span>
+                                    <div class="blue-input profile-div">
+                                        <span id="vendorGUID"></span>
+                                    </div>
+                                </div>
+                                <div class="flex-column" style="margin-top:30px;">
+                                    <span class="text_16_500_6b7783">GST Number</span>
+                                    <div class="blue-input profile-div">
+                                        <span id="vendorGSTNumber"></span>
+                                    </div>
+                                </div>
+                                <div class="flex-column" style="margin-top:30px;">
+                                    <span class="text_16_500_6b7783">Creation Date</span>
+                                    <div class="blue-input profile-div">
+                                        <span id="vendorCreationDate"></span>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-1"></div>
+
+                            <div class="col-md-5">
+
+                                <div class="flex-row">
+                                    <img src='../../assets/img/blueHome2x.png' style="width:20px;height:20px;"/>
+                                    <span style="padding-left: 10px;" class="text_20_500_1766a6">Vendor Address Information</span>
+                                </div>
+
+                                <div class="flex-column" style="margin-top:30px;">
+                                    <span class="text_16_500_6b7783">Address Line 1</span>
+                                    <div class="blue-input profile-div">
+                                        <span id="vendorAddressLineOne"></span>
+                                    </div>
+                                </div>
+                                <div class="flex-column" style="margin-top:30px;">
+                                    <span class="text_16_500_6b7783">Address Line 2</span>
+                                    <div class="blue-input profile-div">
+                                        <span id="vendorAddressLineTwo"></span>
+                                    </div>
+                                </div>
+                                <div class="flex-column" style="margin-top:30px;">
+                                    <span class="text_16_500_6b7783">Zip/Postal Code</span>
+                                    <div class="blue-input profile-div">
+                                        <span id="vendorZipCode"></span>
+                                    </div>
+                                </div>
+                                <div class="flex-row" style="margin-top:30px;">
+                                    <div class="flex-column" style="flex:1">
+                                        <span class="text_16_500_6b7783">City</span>
+                                        <div class="blue-input profile-div">
+                                            <span id="vendorCity"></span>
+                                        </div>
+                                    </div>
+                                    <div class="flex-column" style="margin-left: 10px; flex:1;">
+                                        <span class="text_16_500_6b7783">State</span>
+                                        <div class="blue-input profile-div">
+                                            <span id="vendorState"></span>
+                                        </div>
+                                    </div>
+                                    <div class="flex-column" style="margin-left: 10px; flex:1;">
+                                        <span class="text_16_500_6b7783">Country</span>
+                                        <div class="blue-input profile-div">
+                                            <span id="vendorCountry"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </div>
+                  
+        </div>
+
+        <script type="text/javascript" src="../../helpers.js"></script>
+        <script>
+
+        var vendor;
+
+        $(async()=>{ 
+            await getMenu('Profile')
+            await backNavigation() 
+        })
+        backNavigation=()=>{
+            $('#imgForward').css('opacity',0.5)
+            $('#imgBack').css({'opacity':1 , 'cursor' : 'pointer'}).click(()=>{
+                window.location.href="../dashboard.html"
+            })
+        }
+        
+        function goBack(){
+            window.location.href = 'settings.html';
+        }
+
+        async function loadProfile(){
+
+            var data = JSON.parse(localStorage.getItem('loginResponse'));
+            var phoneNumber = JSON.parse(localStorage.getItem('phoneNumber'));
+            var x = data.storeList[0];
+
+            vendor = await new Promise((resolve,reject)=>{
+            
+                db.get('SELECT * FROM vendors',function(err,data){
+
+                    if(err){
+                        console.log(err)
+                    }
+                    else{
+                        console.log(data)
+                        resolve(data);
+                    }
+                })
+            
+            })
+            
+            $('#storeName').text(x.storeName);
+            $('#phoneNumber').text(phoneNumber);
+            $('#hulCode').text(x.storeGUID);
+            $('#addressLineOne').text(x.outletAddLine1);
+            $('#addressLineTwo').text(x.outletAddLine2);
+            $('#zipCode').text(x.outletAddPincode);
+            $('#city').text(x.outletAddCity)
+            $('#state').text(x.outletAddState)
+            $('#country').text(x.outletAddCountry)
+
+
+            $('#vendorStoreName').text(vendor.vendorName);
+            $('#vendorGUID').text(vendor.vendorGUID);
+            $('#vendorGSTNumber').text(vendor.GSTNumber);
+            $('#vendorAddressLineOne').text(vendor.addressLine1);
+            $('#vendorAddressLineTwo').text(vendor.addressLine2);
+            $('#vendorZipCode').text(vendor.pincode);
+            $('#vendorCity').text(vendor.city)
+            $('#vendorState').text(vendor.state)
+            $('#vendorCountry').text(vendor.country)
+
+        }
+
+        </script>
+    </body>
+</html>

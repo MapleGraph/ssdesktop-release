@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html>
+  <head>
+     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+    <script type="text/javascript" src="../loadCSS.js"></script>
+    <script type="text/javascript" src="../helpers/apiCall.js"></script>
+	<script>
+        window.$ = window.jQuery = require('../node_modules/jquery/dist/jquery.min.js')
+        const {dialog} = require('electron').remote
+    </script>
+    <style>
+
+        #content{
+            width: calc(90% - 40px);
+            margin: auto;
+        }
+
+        .countBadge{
+            width: 48px;
+            height: 48px;
+            border-radius:100%;
+            box-shadow: 0 2px 8px 0 rgba(174, 174, 174, 0.51);
+            background-color: #0e9d58;
+            justify-content:center;
+            position:absolute;
+            top:-20px;
+            right:-20px;
+        }
+        .viewCard{
+            width: 104px;
+            height: 32px;
+            border-radius: 24px;
+            background-color: #1766a6;
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 1.25;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .card-data{
+            border-bottom: solid 1px #d8d8d8;
+            display: flex;
+            padding: 18px 0;
+            width: 100%;
+            justify-content: space-between;
+        }
+        .card-data div{
+            padding: 0 0 8px 0;
+        }
+        .card-data-div{
+            display: flex;
+            justify-content: space-between;
+            /* padding-bottom: 8px; */
+        }
+        .card-text{
+            font-size: 18px;
+            font-weight: bold;
+            line-height: 1.78;
+            color: #1766a6;
+            width: 70%;
+        }
+        .card-value{
+            font-size: 16px;
+            font-weight: bold;
+            line-height: 2;
+            text-align: right;
+            color: #212b36;
+        }
+        .report-title{
+            font-size: 20px;
+            font-weight: bold;
+            line-height: 1.6;
+            color: #212b36;
+            /* padding-bottom: 8px; */
+        }
+
+        .inventoryRow{
+            flex-wrap:unset; 
+        }
+        .cardLink{
+            flex-basis: 50%;
+            min-width: 0;
+            min-height: 294px;
+            /* padding:unset; */
+            justify-content:space-evenly;
+        }
+        .inventoryText{
+            font-weight: bold;
+        }
+
+        @media(max-width: 1358px) and (min-width: 1310px){
+            .cardLink{
+                min-height: 310px;
+            }
+        }
+        @media(max-width: 1309px) and (min-width: 1212px){
+            .cardLink{
+                min-height: 326px;
+            }
+        }
+        @media(max-width: 1211px) and (min-width: 1183px){
+            .cardLink{
+                min-height: 342px;
+            }
+        }
+        @media(max-width: 1182px) and (min-width: 1128px){
+            .cardLink{
+                min-height: 358px;
+            }
+        }
+        @media(max-width: 1127px) and (min-width: 992px){
+            .cardLink{
+                min-height: 374px;
+            }
+         }
+
+    </style>
+  </head>  
+  <body  onload="">       
+    <div class='headerDiv' w3-include-html="dashboardHeader.html"></div>
+
+    <div id='base'>
+        <div id="sidebar" w3-include-html="dashboardSidebar.html"></div>
+        <div id="content">
+            <div class="margin-40" style="margin-bottom: 0">
+                <div class="flex-row margin-20" style="justify-content:space-between">
+                    <div class="big_header margin-20">
+                        Homepage
+                    </div>
+                    <!-- <div class="flex-row">
+                        <button class="btnBlue" style="padding: 10px 65px;" onclick="resync()">Resync</button>
+                        <button class="btnBlue" style="padding: 10px 65px;margin-left: 15px" onclick="logout()">Log Out</button>
+                    </div> -->
+                </div>
+                <div class="flex-row margin-20">
+                    <!-- <h2 class="margin-20 text_24_500_212b36">  Perform all your operation of supply chain management</h2> -->
+                </div>
+            </div>
+            <section>
+                <div class="section-body">
+                    <div class="col-md-6">
+                        <div class="row inventoryRow">
+                            <a class='card cardLink ' href="./billing/billingDashboard.html">
+                                <img   class='inventoryIcon' src="../assets/img/outlet_billing_icon.png">
+                                <span class="badge badge-success countBadge flex-row text_24_500_fff" id='billingOrderCount' style = "display:none"></span>
+                                <span class='inventoryText'>Outlet Billing and Returns</span>
+                                <span class="viewCard">
+                                    View
+                                </span>
+                            </a>
+                            <a class='card cardLink' href="./inventory/inventoryDashboard.html">
+                                <span class="badge badge-success countBadge flex-row text_24_500_fff" id='egirCount' style = "display:none"></span>
+                                <img  class='inventoryIcon' src="../assets/img/place_order_rs.png">
+                                <span class='inventoryText'>Place Order/Return to RS</span>
+                                <span class="viewCard">
+                                    View
+                                </span>
+                            </a>
+                        </div>
+                        <div class="row inventoryRow">
+                            <a class='card cardLink' href='./catalogue/productDetails.html'>
+                                <img class='inventoryIcon' src="../assets/img/product_details_icon.png">
+                                <span class='inventoryText'>Product Details</span>
+                                <span class="viewCard">
+                                    View
+                                </span>
+                            </a>
+                            <a class='card cardLink' href='./manageStock/stockLevel.html' >
+                                <img  class='inventoryIcon' src="../assets/img/manage_stock_rs.png">
+                                <span class='inventoryText'>Manage Stock</span>
+                                <span class="viewCard">
+                                    View
+                                </span>
+                            </a>
+                        </div>
+    
+                    </div>
+                    <div class="col-md-6">
+                        <div class="row inventoryRow">
+                            <a class='card cardLink' href="./unipay/main.html" style="min-height: 620px">
+                                <img class='inventoryIcon' src="../assets/img/unipay_icon.png">
+                                <span class='inventoryText'>Ushop Points</span>
+                                    <div class="card-data" >
+                                        <span class="card-text">Total Points</span>
+                                        <span class="card-value" id="totalPoints"></span>
+                                    </div>
+                                    <div class="card-data"> 
+                                        <span class="card-text">Total Reedemed Points</span>
+                                        <span class="card-value" id="redeemPoints"></span>
+                                    </div>
+                                    <div class="card-data">
+                                        <span class="card-text">Total Active Debits</span>
+                                        <span class="card-value" id="debitPoints"></span>
+                                    </div>
+                                    <div class="card-data" style="border-bottom: none;">
+                                        <span class="card-text">Total Active Credits</span>
+                                        <span class="card-value" id="creditPoints"></span>
+                                    </div>
+                                <span class="viewCard">View</span>
+                            </a>
+                            <a class='card cardLink' href='./reports/report.html' style="min-height: 620px" >
+                                <img  class='inventoryIcon' src="../assets/img/reports_icon.png">
+                                <span class='inventoryText'>Reports</span>
+                                    <div class="card-data" style="flex-direction: column">
+                                        <div class="report-title">Target Vs Achievement</div>
+                                        <div class="card-data-div">
+                                            <span class="card-text">Target</span>
+                                            <span class="card-value" id="moc_target">0</span>
+                                        </div>
+                                    </div>
+                                    <div class="card-data" style="flex-direction:column">
+                                        <div class="report-title">Sales</div>
+                                        <div class="card-data-div">
+                                            <span class="card-text">Net Achievement</span>
+                                            <span class="card-value" id="net_acheivement">0</span>
+                                        </div>
+                                        <div class="card-data-div">
+                                            <span class="card-text">Total No. of Bill</span>
+                                            <span class="card-value" id="total_bills">0</span>
+                                        </div>
+                                    </div>
+                                    <div class="card-data" style="flex-direction:column; border-bottom: none;">
+                                        <div class="report-title">Sales Return Value</div>
+                                        <div class="card-data-div">
+                                            <span class="card-text">Void Price</span>
+                                            <span class="card-value" id="void_sales">0</span>
+                                        </div>
+                                        <div class="card-data-div">
+                                            <span class="card-text">Total Void Bill</span>
+                                            <span class="card-value" id="total_void_bills">0</span>
+                                        </div>
+                                    </div>
+                                <span class="viewCard">View</span> 
+                            </a>
+                        </div>
+                    
+                    </div>
+                    <div class="col-md-6">
+                            <a class='card cardLink' id='counterSale'>
+                            <span class="badge badge-success countBadge flex-row text_24_500_fff" id='egirCount' style = "display:none"></span>
+                            <img  class='inventoryIcon' src="../assets/img/place_order_rs.png">
+                            <span class='inventoryText'>Counter Sale</span>
+                            <span class="viewCard">
+                                View
+                            </span>
+                            </a>
+                    </div>
+                <div><!--end .section-body -->
+            </section>       
+        </div>
+    </div>
+    
+    <script type="text/javascript" src="../helpers.js"></script>
+    <script type="text/javascript" src="../loadJS.js"></script>
+
+    <script type="text/javascript">        
+        // window.$ = window.jQuery = require('../node_modules/jquery/dist/jquery.min.js');
+        // const {dialog} = require('electron').remote;
+
+        const UI = require('../jobs/unipayData.js');     
+        const runQuery = require('./runQuery.js');
+
+        var basePath = process.env.basepath;
+        
+        var unipayResponse;
+        var customerID=0; 
+        
+        var fetchingErrMsg='Error in fetching data!'
+
+        $(async()=>{
+            await getMenu('Home Page')
+            await backNavigation()
+            // const unipayAPITransactionsPromised = require(basePath+'/jobs/unipayAPITransactionsPromised.js');
+            // await unipayAPITransactionsPromised.unipayAPITransactions();
+            // console.log('dashboard')
+            // unipayResponse = await UI.unipayUIUpdate();
+            // console.log(unipayResponse)
+
+            // var totalPoints = unipayResponse.pointsEarned + unipayResponse.pointsRedeemed - unipayResponse.pointsReadjusted;
+
+            // $('#totalPoints').text(totalPoints);
+            // $('#redeemPoints').text(Math.abs(unipayResponse.pointsRedeemed))
+            // $('#debitPoints').text(unipayResponse.debit);
+            // $('#creditPoints').text(unipayResponse.credit);
+
+            db.all("SELECT * FROM OrderInformation Where isSync = 0", function(err, rows){
+                
+                console.log(rows)
+            })
+            getPendingPICount()
+            getPendingDeliveries()
+            getCustomerForSale()
+        })
+        
+        backNavigation=()=>{
+            $('#imgBack').css('opacity',0.5)
+            $('#imgForward').css('opacity',0.5)
+            // $('#imgMenu').css('display','none')
+        }
+
+        getCustomerForSale=async()=>{
+            customerData = await new Promise((resolve)=>{
+                db.get(`SELECT * FROM customers WHERE isMappedToSS = 1`,(error,data)=>{
+                    if(error){
+                        isError(fetchingErrMsg)
+                    }
+                    else{
+                        resolve(data)
+                    }
+                })
+            })
+            if(customerData){
+                customerID = customerData.customerID
+                customerName = customerData.firstName
+                $('#counterSale').attr('href',`./billing/manualBilling.html?custID=${customerID}=${customerName}`)
+            }
+            else{
+                $('#counterSale').attr('href',`./billing/manualBilling.html`)
+            }
+        }
+
+
+        function getPendingPICount(){ 
+
+            db.all(`SELECT count(*) as totalCount FROM piSummary AS A WHERE A.status='RECEIVED'`,(err,count)=>{
+                if(err){
+                    console.log(err)
+                    isError(fetchingErrMsg)
+                }
+                else{
+                    var countVal=0;
+                    if(count.length){
+                        countVal= count[0].totalCount
+                        console.log(countVal)
+                        if(countVal){
+                            $('#billingOrderCount').css('display','flex')
+                            $('#billingOrderCount').text(countVal)
+                        }
+                    }
+                }
+            })
+            
+        }
+
+        function getPendingDeliveries(){	
+            db.all(`SELECT count(*) as totalCount FROM poSummary AS A WHERE A.status='RECEIVED'`,(err,count)=>{
+                if(err){
+                    console.log(err)
+                        isError(fetchingErrMsg)
+                }
+                else{
+                    var countVal=0;
+                    if(count.length){
+                        countVal= count[0].totalCount
+                        if(countVal){
+                            $('#egirCount').css('display','flex')
+                            $('#egirCount').text(countVal)
+                        }
+                    }
+                }
+            })
+        }   
+
+        var serialNumber = localStorage.getItem('serialNumber');
+        var data = {
+            userID :userID, 
+            serialNumber:serialNumber
+		}
+
+        function logout(){
+            const dialogOptions = {type: 'info', buttons: ['Cancel', 'OK'], message: 'Are you sure you want to logout?'}
+            dialog.showMessageBox(dialogOptions, async i => {
+                if(i){
+                    let response = await postWithoutStore('logOut',data)
+                    console.log(response)
+                    if(response.data.status){
+                    localStorage.setItem('loggedIn',false);
+                     window.location.href="../index.html"
+                    }
+                }
+            })
+        }
+
+        function resync(){
+            const dialogOptions = {type: 'info', buttons: ['Cancel', 'OK'], message: 'Are you sure you want to resync data again?'}
+            dialog.showMessageBox(dialogOptions, async i => {
+                if(i){
+                   window.location.href="dataSync.html"
+                }
+            })
+        }
+
+        function formatDate(date) {
+            var d = new Date(date),
+                month = '' + (d.getMonth() + 1),
+                day = '' + d.getDate(),
+                year = d.getFullYear();
+
+            if (month.length < 2) 
+                month = '0' + month;
+            if (day.length < 2) 
+                day = '0' + day;
+
+            return [year, month, day].join('-');
+        }
+
+        function getAchievementData(fromDate, toDate){
+
+            db.get(`SELECT CASE WHEN round(sum(sales),2) > 0 THEN round(sum(sales),2) ELSE 0 END AS sales, count(ID) AS orderCount FROM orderInformation where posDate >='${fromDate}' AND posDate <='${toDate}'`, function(err,row){
+
+            if(err){
+                console.log(err);
+                return false;
+            }
+            else{
+                let orderCount = row['orderCount'];
+                let sales = row['sales'];
+               $("#net_acheivement").text(sales);
+               $("#total_bills").text(orderCount);
+
+            }
+
+        })
+        }    
+
+         function mocData(){
+            var mocDetail = null;
+
+          db.get("SELECT * FROM mocs", async function(err,row){
+
+            if(err){
+                console.log(err);
+                return false;
+            }
+            else{
+               mocDetail = row;
+               if(mocDetail){
+                       var monthTarget = mocDetail['monthTarget'];
+                       var fromDate = formatDate(mocDetail['fromDate']);
+                       var toDate = formatDate(mocDetail['toDate']);
+                       $("#moc_target").text(monthTarget);
+                       getAchievementData(fromDate, toDate);
+               }
+
+            }
+
+          })
+
+        }
+
+        function salesReturnData(){
+            db.get("SELECT count(ID) AS totalVoidBills, CASE WHEN round(sum(voidAmount),2) > 0 THEN round(sum(voidAmount),2) ELSE 0 END AS voidSales FROM VoidOrderInformation", function(err,row){
+
+                if(err){
+                console.log(err);
+                return false;
+                }
+                else{
+                    let voidSales = row['voidSales'];
+                    let totalVoidBills = row['totalVoidBills'];
+                    $("#void_sales").text(voidSales);
+                    $("#total_void_bills").text(totalVoidBills);
+
+                }
+
+            })
+        }
+        mocData();
+        salesReturnData();
+    </script>
+
+</body> 
+
+</html>
+
+
+
+
+

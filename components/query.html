@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>  
+  <body style="background-color:#eff1f3; margin-left: 30px;margin-right: 30px">    
+    
+    <a href='../index.html'>Home</a>
+    <h1>Query</h1>
+  </body> 
+  <script type="text/javascript">
+
+    const $ = require("jquery");
+    const axios = require('axios');
+    const api = require('../helpers/apiCall.js');
+    const sqlite3 = require('sqlite3').verbose();
+    const db = new sqlite3.Database('ssDB');
+    var store = JSON.parse(localStorage.getItem('loginResponse'));
+    var storeID = store.storeList[0].storeID;
+    // const routeList = require('../helpers/routeList');
+    const routeList = [
+                    
+                    {routeName:'employees',tableName:'users'}
+  ];
+
+    var method,tableName,routeName,rows,data={key:'dummy'};
+
+    routeList.map(async function(route){
+
+        switch(route.routeName)
+        {
+
+          case 'getChainInfo':
+          method = api.getByChain;
+          break;
+
+          case 'getVendors':
+          method = api.getByChain;
+          break;
+
+          case 'getWarehouses':
+          method = api.getByChain;
+          break;
+
+          case 'getStoreListApp':
+          method = api.getByChain;
+          break;
+
+          case 'getDamageClaimList':
+          method = api.getByChain;
+          break;
+
+          case 'customerInfoApp':
+          method = api.getByChain;
+          break;
+
+          case 'getProductsBatchVariants':
+          method = api.getByChain;
+          break;
+
+          case 'getStoreRegionPricing':
+          method = api.postByChain;
+          data = {
+                storeID:storeID,
+                limit:50000,
+                offset:0
+          }
+          break;
+
+          default : method = api.get;
+        }
+
+        
+        await method(route.routeName,data)
+        .then(async(res)=>{
+
+          switch(route.routeName)
+          {
+            case 'chargeList': 
+            rows = res.data.taxList;
+            break;
+
+            case 'employees':
+            rows = res.data.employeesList;
+            break;
+
+            case 'getStoreInfo':
+            rows = res.data.storeDetails;
+            break;
+
+            case 'accounts':
+            rows = res.data.accountsInformation;
+            break;
+
+            case 'payments':
+            rows = res.data.payments;
+            break;
+
+            case 'global':
+            rows = res.data.globalTypeInformation;
+            break;
+
+            case 'globaltypes':
+            rows = res.data.globalTypeInformation
+            break;
+
+            case 'productsTest':
+            rows = res.data.productList;
+            break;
+
+            case 'categories':
+            rows = res.data.categoryList;
+            break;
+
+            case 'brands':
+            rows = res.data.brandList;
+            break;
+            
+            case 'discounts':
+            rows = res.data.discountMaster;
+            break;
+
+            case 'getWarehouses':
+            rows = res.data.warehouseList;
+            break;
+
+            default : rows = res.data.data;
+          }
+          console.log('before query ',route.routeName,rows.length)
+          await queryBuilder(route.tableName,route.routeName,rows)
+        })
+        console.log('after query ',route.routeName)
+    })
+
+
+  async function queryBuilder(tableName,routeName,rows)
+  {
+
+    let query = "PRAGMA table_info("+tableName+")";
+    let deleteQuery = "DELETE FROM "+tableName;
+
+    console.log(query)
+
+    return new Promise ((resolve, reject) => {
+
+      db.all(query,async function(err,result){
+
+      console.log('schema '+routeName,result);
+        
+        required = {}
+        
+        // required object determines which keys from response are present in database table
+        // building required object
+
+        for(let key in rows[0]){
+          
+          for(let i=0;i<result.length;i++)
+          {
+            if(key.toLowerCase() == result[i].name.toLowerCase())
+            {
+              required[key] = 'true'
+              break; 
+            }
+          }
+        }
+
+        // console.log('required ',required)
+        // return ;
+
+        var keyQuery,valueQuery = '',row,value;
+      
+        // building the columns of table 
+
+        keyQuery = '(';
+        for(let key in required)
+        {
+          keyQuery += ' ' + key + ',';
+        }
+        
+        keyQuery = keyQuery.substr(0,keyQuery.length-1);
+        keyQuery += ')';
+
+        // building the values to be inserted
+        // row corresponds to each row of table
+
+        for(let i=0;i<rows.length;i++)
+        {
+          row = '(';
+
+          for(let key in required)
+          {
+            if(typeof(rows[i][key]) == 'string'){
+              value = JSON.stringify(rows[i][key]);
+            }
+            else{
+              value = rows[i][key];
+            }
+            row += ' ' + value + ',';
+          }
+        
+          row = row.substring(0,row.length-1);
+          row += ')';
+
+          valueQuery += row + ',';
+          
+        }
+        
+        valueQuery = valueQuery.substring(0,valueQuery.length-1);
+
+        var finalQuery = 'INSERT INTO '+ tableName + keyQuery+' VALUES '+valueQuery;
+        console.log(finalQuery)
+
+        resolve();
+        
+        // db.serialize(function(){
+
+        //   db.run(deleteQuery,function(err){
+        //     console.log('delete '+tableName,err)
+        //   });
+
+        //   db.run(finalQuery,function(err){
+        //     console.log('insert '+tableName,err)
+        //     resolve();
+        //   });
+
+        // })
+
+      })
+    })
+
+  }
+
+  </script>
+
+</html>
+
+
+
+
+
