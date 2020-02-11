@@ -1,6 +1,0 @@
-appId: electronUpdate
-publish:
-  provider: github
-  token: accesstoke 
-  url: https://github.com/MapleGraph/ssdesktop-release
-  files: SSPDF

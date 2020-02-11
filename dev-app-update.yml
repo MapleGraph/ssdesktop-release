@@ -1,4 +1,0 @@
-version: 1.0.1
-provider: generic
-token: accesstoke 
-url: https://github.com/MapleGraph/ssdesktop-release
